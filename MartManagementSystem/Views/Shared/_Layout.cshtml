@@ -1,0 +1,74 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Home";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mart Management System</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3H5L5.4 5M5.4 5H21L19 13H7M5.4 5L7 13m0 0L6 17H19M7 13L6 17M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM19 20C19 20.5523 18.5523 21 18 21C17.4477 21 17 20.5523 17 20C17 19.4477 17.4477 19 18 19C18.5523 19 19 19.4477 19 20Z" stroke="url(#brand-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="brand-grad" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#3b82f6"/>
+                            <stop offset="1" stop-color="#8b5cf6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>MartSystem</span>
+            </div>
+            <nav>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="@Url.Action("Index", "Home")" class="sidebar-link @(currentController == "Home" ? "active" : "")">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 13h1v7c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-7h1a1 1 0 0 0 .707-1.707l-9-9a.999.999 0 0 0-1.414 0l-9 9A1 1 0 0 0 3 13zm7 7v-5h4v5h-4z"/>
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index", "Product")" class="sidebar-link @(currentController == "Product" ? "active" : "")">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21.822 7.431A1 1 0 0 0 21 7H3a1 1 0 0 0-.822.431 1 1 0 0 0 .025 1.066l2 3A1 1 0 0 0 5 12h14a1 1 0 0 0 .797-.393l2-3a1 1 0 0 0 .025-1.076zM5.586 10l-1.333-2h15.494l-1.333 2H5.586zM2 14h20v2H2zm0 4h20v2H2z"/>
+                            </svg>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index", "Customer")" class="sidebar-link @(currentController == "Customer" ? "active" : "")">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.579 2 2 6.579 2 12s4.579 10 10 10 10-4.579 10-10S17.421 2 12 2zm0 3c1.93 0 3.5 1.57 3.5 3.5S13.93 12 12 12s-3.5-1.57-3.5-3.5S10.07 5 12 5zm0 14c-3.86 0-7-2.69-7-6 0-.552.448-1 1-1h12c.552 0 1 .448 1 1 0 3.31-3.14 6-7 6z"/>
+                            </svg>
+                            <span>Customers</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index", "Order")" class="sidebar-link @(currentController == "Order" ? "active" : "")">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 15v-3h-2v3h-3v2h3v3h2v-3h3v-2h-3zM11 5H4v2h7V5zm0 4H4v2h7V9zm-7 6h5v-2H4v2zm0 4h5v-2H4v2zm9-12h7v2h-7V7zm0 4h7v2h-7v-2z"/>
+                            </svg>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

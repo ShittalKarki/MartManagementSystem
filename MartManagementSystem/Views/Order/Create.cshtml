@@ -1,0 +1,143 @@
+@model MartManagementSystem.Models.Order
+@{
+    ViewData["Title"] = "New Sales Order";
+    var customers = ViewBag.Customers as IEnumerable<MartManagementSystem.Models.Customer> ?? new List<MartManagementSystem.Models.Customer>();
+    var products = ViewBag.Products as IEnumerable<MartManagementSystem.Models.Product> ?? new List<MartManagementSystem.Models.Product>();
+}
+
+<div class="header-wrapper">
+    <div>
+        <h1 class="page-title">Place Sales Order</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.25rem;">Select a customer, product, and specify order quantities.</p>
+    </div>
+    <a href="@Url.Action("Index")" class="btn-secondary">Back to Logs</a>
+</div>
+
+<div class="panel form-panel">
+    <form asp-action="Create" method="post" id="orderForm">
+        @Html.AntiForgeryToken()
+        
+        <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+        <div class="form-group">
+            <label asp-for="CustomerId" class="form-label">Select Customer</label>
+            <select asp-for="CustomerId" class="form-control" required>
+                <option value="">-- Choose Customer --</option>
+                @foreach (var c in customers)
+                {
+                    <option value="@c.Id">@c.FullName (@c.Email)</option>
+                }
+            </select>
+            <span asp-validation-for="CustomerId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ProductId" class="form-label">Select Product</label>
+            <select asp-for="ProductId" class="form-control" id="productSelect" required>
+                <option value="">-- Choose Product --</option>
+                @foreach (var p in products)
+                {
+                    <option value="@p.Id">@p.Name</option>
+                }
+            </select>
+            <span asp-validation-for="ProductId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Quantity" class="form-label">Order Quantity</label>
+            <input asp-for="Quantity" class="form-control" type="number" min="1" id="qtyInput" placeholder="Enter quantity" required />
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+        </div>
+
+        <!-- Dynamic Calculator Panel -->
+        <div class="calc-summary" id="calcPanel" style="display: none;">
+            <div class="calc-row">
+                <span>Unit Price:</span>
+                <span id="calcUnitPrice">$0.00</span>
+            </div>
+            <div class="calc-row">
+                <span>Available Stock:</span>
+                <span id="calcStock" class="calc-highlight">0 units</span>
+            </div>
+            <div class="calc-row total">
+                <span>Total Cost:</span>
+                <span id="calcTotalCost">$0.00</span>
+            </div>
+            <div id="stockWarning" style="color: var(--accent-rose); font-size: 0.85rem; font-weight: 500; display: none; margin-top: 0.5rem;">
+                ⚠ Warning: Quantity exceeds available stock!
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="@Url.Action("Index")" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary" id="submitBtn">Place Order</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const productSelect = document.getElementById("productSelect");
+            const qtyInput = document.getElementById("qtyInput");
+            const calcPanel = document.getElementById("calcPanel");
+            const calcUnitPrice = document.getElementById("calcUnitPrice");
+            const calcStock = document.getElementById("calcStock");
+            const calcTotalCost = document.getElementById("calcTotalCost");
+            const stockWarning = document.getElementById("stockWarning");
+            const submitBtn = document.getElementById("submitBtn");
+
+            let currentProduct = null;
+
+            async function updateCalculations() {
+                const productId = productSelect.value;
+                if (!productId) {
+                    calcPanel.style.display = "none";
+                    currentProduct = null;
+                    return;
+                }
+
+                // If switching product, fetch fresh details
+                if (!currentProduct || currentProduct.id != productId) {
+                    try {
+                        const response = await fetch(`/Product/GetDetails/${productId}`);
+                        if (response.ok) {
+                            currentProduct = await response.json();
+                        } else {
+                            calcPanel.style.display = "none";
+                            return;
+                        }
+                    } catch (err) {
+                        console.error("Error fetching product details", err);
+                        calcPanel.style.display = "none";
+                        return;
+                    }
+                }
+
+                calcPanel.style.display = "flex";
+
+                // Update UI elements
+                calcUnitPrice.innerText = `$${currentProduct.price.toFixed(2)}`;
+                calcStock.innerText = `${currentProduct.stock} units`;
+
+                const qty = parseInt(qtyInput.value) || 0;
+                const total = currentProduct.price * qty;
+                calcTotalCost.innerText = `$${total.toFixed(2)}`;
+
+                // Verify stock bounds
+                if (qty > currentProduct.stock) {
+                    stockWarning.style.display = "block";
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = 0.5;
+                } else {
+                    stockWarning.style.display = "none";
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = 1;
+                }
+            }
+
+            productSelect.addEventListener("change", updateCalculations);
+            qtyInput.addEventListener("input", updateCalculations);
+        });
+    </script>
+}
