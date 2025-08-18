@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Deals - Customer Dashboard</title>
+    <link rel="stylesheet" href="customer-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div class="logo">
+                    <i class="fas fa-store"></i>
+                    <h1>Daily Deals</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search products...">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="user-menu">
+                        <button class="user-btn" id="userMenuBtn">
+                            <i class="fas fa-user"></i>
+                            <span id="userName">Guest User</span>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="#" onclick="showProfile()">
+                                <i class="fas fa-user-circle"></i> Profile
+                            </a>
+                            <a href="#" onclick="showOrders()">
+                                <i class="fas fa-shopping-bag"></i> My Orders
+                            </a>
+                            <a href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                    <div class="cart-container">
+                        <button class="cart-btn" onclick="toggleCart()">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count" id="cartCount">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Category Navigation -->
+            <nav class="category-nav">
+                <div class="nav-container">
+                    <button class="nav-item active" data-category="all">
+                        <i class="fas fa-th-large"></i>
+                        All Products
+                    </button>
+                    <button class="nav-item" data-category="grocery">
+                        <i class="fas fa-shopping-basket"></i>
+                        Grocery & Food
+                    </button>
+                    <button class="nav-item" data-category="fruits">
+                        <i class="fas fa-apple-alt"></i>
+                        Fruits
+                    </button>
+                    <button class="nav-item" data-category="meat">
+                        <i class="fas fa-drumstick-bite"></i>
+                        Meat & Seafood
+                    </button>
+                    <button class="nav-item" data-category="bakery">
+                        <i class="fas fa-birthday-cake"></i>
+                        Bakery
+                    </button>
+                    <button class="nav-item" data-category="packaged">
+                        <i class="fas fa-box"></i>
+                        Packaged Foods
+                    </button>
+                    <button class="nav-item" data-category="personal">
+                        <i class="fas fa-pump-soap"></i>
+                        Personal Care
+                    </button>
+                    <button class="nav-item" data-category="household">
+                        <i class="fas fa-home"></i>
+                        Household
+                    </button>
+                    <button class="nav-item" data-category="stationery">
+                        <i class="fas fa-pencil-alt"></i>
+                        Stationery
+                    </button>
+                    <button class="nav-item" data-category="electronics">
+                        <i class="fas fa-mobile-alt"></i>
+                        Electronics
+                    </button>
+                    <button class="nav-item" data-category="baby">
+                        <i class="fas fa-baby"></i>
+                        Baby Care
+                    </button>
+                    <button class="nav-item" data-category="footwear">
+                        <i class="fas fa-shoe-prints"></i>
+                        Footwear
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <span id="breadcrumbText">All Products</span>
+            </div>
+
+            <!-- Filters and Sort -->
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label for="sortSelect">Sort by:</label>
+                    <select id="sortSelect" onchange="sortProducts()">
+                        <option value="name">Name A-Z</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="popularity">Popularity</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="priceRange">Price Range:</label>
+                    <select id="priceRange" onchange="filterByPrice()">
+                        <option value="all">All Prices</option>
+                        <option value="0-100">Under NPR 100</option>
+                        <option value="100-500">NPR 100 - 500</option>
+                        <option value="500-1000">NPR 500 - 1000</option>
+                        <option value="1000+">Above NPR 1000</option>
+                    </select>
+                </div>
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="grid">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button class="view-btn" data-view="list">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-container" id="productsContainer">
+                <!-- Products will be loaded here -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="load-more-container">
+                <button class="load-more-btn" id="loadMoreBtn" onclick="loadMoreProducts()">
+                    <i class="fas fa-plus"></i> Load More Products
+                </button>
+            </div>
+        </main>
+
+        <!-- Shopping Cart Sidebar -->
+        <div class="cart-sidebar" id="cartSidebar">
+            <div class="cart-header">
+                <h3>Shopping Cart</h3>
+                <button class="close-cart" onclick="toggleCart()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be displayed here -->
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-amount">NPR <span id="cartTotal">0.00</span></span>
+                </div>
+                <button class="checkout-btn" onclick="proceedToCheckout()">
+                    <i class="fas fa-credit-card"></i> Proceed to Checkout
+                </button>
+            </div>
+        </div>
+
+        <!-- Product Quick View Modal -->
+        <div class="modal" id="productModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalProductName">Product Name</h3>
+                    <span class="close" onclick="closeProductModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="product-details">
+                        <div class="product-image">
+                            <img id="modalProductImage" src="" alt="Product">
+                        </div>
+                        <div class="product-info">
+                            <h4 id="modalProductDescription">Product description...</h4>
+                            <div class="product-price">
+                                <span class="current-price">NPR <span id="modalProductPrice">0</span></span>
+                                <span class="original-price" id="modalOriginalPrice">NPR 0</span>
+                            </div>
+                            <div class="product-meta">
+                                <span class="stock-info">
+                                    <i class="fas fa-check-circle"></i> In Stock
+                                </span>
+                                <span class="category-info">
+                                    <i class="fas fa-tags"></i> <span id="modalProductCategory">Category</span>
+                                </span>
+                            </div>
+                            <div class="quantity-selector">
+                                <label for="modalQuantity">Quantity:</label>
+                                <div class="quantity-controls">
+                                    <button onclick="decreaseQuantity()">-</button>
+                                    <input type="number" id="modalQuantity" value="1" min="1">
+                                    <button onclick="increaseQuantity()">+</button>
+                                </div>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCartFromModal()">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Modal -->
+        <div class="modal" id="checkoutModal">
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h3>Checkout</h3>
+                    <span class="close" onclick="closeCheckoutModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="checkout-form">
+                        <div class="form-section">
+                            <h4>Customer Information</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="checkoutName">Full Name</label>
+                                    <input type="text" id="checkoutName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="checkoutPhone">Phone Number</label>
+                                    <input type="tel" id="checkoutPhone" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="checkoutEmail">Email Address</label>
+                                <input type="email" id="checkoutEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="checkoutAddress">Delivery Address</label>
+                                <textarea id="checkoutAddress" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4>Order Summary</h4>
+                            <div class="order-items" id="checkoutItems">
+                                <!-- Order items will be displayed here -->
+                            </div>
+                            <div class="order-total">
+                                <div class="total-row">
+                                    <span>Subtotal:</span>
+                                    <span>NPR <span id="checkoutSubtotal">0.00</span></span>
+                                </div>
+                                <div class="total-row">
+                                    <span>Delivery Fee:</span>
+                                    <span>NPR <span id="deliveryFee">50.00</span></span>
+                                </div>
+                                <div class="total-row final">
+                                    <span>Total:</span>
+                                    <span>NPR <span id="checkoutTotal">0.00</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-actions">
+                        <button class="btn-secondary" onclick="closeCheckoutModal()">Cancel</button>
+                        <button class="btn-primary" onclick="placeOrder()">
+                            <i class="fas fa-check"></i> Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
+    </div>
+
+    <script src="customer-script.js"></script>
+</body>
+</html>
