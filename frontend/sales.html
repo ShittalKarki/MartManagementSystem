@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales - Daily Deals Inventory Management System</title>
+    <link rel="stylesheet" href="shared/styles/main.css">
+    <link rel="stylesheet" href="shared/styles/sales.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <h1>Daily Deals</h1>
+                <span class="subtitle">Inventory System</span>
+            </div>
+            <nav class="side-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-boxes"></i> <span>Products</span>
+                </a>
+                <a href="sales.html" class="nav-item active">
+                    <i class="fas fa-cash-register"></i> <span>Sales</span>
+                </a>
+                <a href="purchases.html" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i> <span>Purchases</span>
+                </a>
+                <a href="inventory.html" class="nav-item">
+                    <i class="fas fa-warehouse"></i> <span>Inventory</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i> <span>Reports</span>
+                </a>
+                <a href="suppliers.html" class="nav-item">
+                    <i class="fas fa-truck"></i> <span>Suppliers</span>
+                </a>
+                <a href="login.html" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin User</span>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="tab-header">
+                    <h2>Sales Orders</h2>
+                    <button class="btn btn-success" onclick="showSalesModal()">
+                        <i class="fas fa-plus"></i> New Sale
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Total Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <!-- Sales orders will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Sales Modal -->
+    <div id="salesModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>Create New Sale</h3>
+                <span class="close" onclick="closeSalesModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="salesForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saleCustomer">Customer</label>
+                            <input type="text" id="saleCustomer" placeholder="Walk-in Customer">
+                        </div>
+                        <div class="form-group">
+                            <label for="saleDate">Date</label>
+                            <input type="date" id="saleDate" required>
+                        </div>
+                    </div>
+                    
+                    <div class="items-section">
+                        <h4>Sale Items</h4>
+                        <div class="items-container" id="saleItemsContainer">
+                            <!-- Sale items will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-info btn-sm" onclick="addSaleItem()">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                    </div>
+                    
+                    <div class="summary-section">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="saleSubtotal">NPR 0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Discount:</span>
+                            <div class="discount-input">
+                                <input type="number" id="saleDiscountPercent" min="0" max="100" value="0" onchange="updateSaleTotals()">
+                                <span>%</span>
+                                <span>NPR</span>
+                                <input type="number" id="saleDiscountAmount" min="0" value="0" onchange="updateSaleTotals()">
+                            </div>
+                        </div>
+                        <div class="summary-row">
+                            <span>VAT (13%):</span>
+                            <span id="saleVat">NPR 0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="saleTotal">NPR 0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeSalesModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">Complete Sale</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sale Details Modal -->
+    <div id="saleDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Sale Details</h3>
+                <span class="close" onclick="closeSaleDetailsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="sale-details-header">
+                    <div>
+                        <h4>Invoice #: <span id="detailsInvoiceNumber"></span></h4>
+                        <p>Date: <span id="detailsDate"></span></p>
+                        <p>Customer: <span id="detailsCustomer"></span></p>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary btn-sm" onclick="printSaleDetails()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="saleDetailsTableBody">
+                            <!-- Sale details will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="sale-details-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="detailsSubtotal">NPR 0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Discount:</span>
+                        <span id="detailsDiscount">NPR 0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>VAT (13%):</span>
+                        <span id="detailsVat">NPR 0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="detailsTotal">NPR 0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i id="toast-icon" class="fas"></i>
+            <div class="toast-message" id="toast-message"></div>
+        </div>
+    </div>
+
+    <!-- Sale Item Template (hidden) -->
+    <template id="saleItemTemplate">
+        <div class="item-row">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Product</label>
+                    <select class="product-select" required onchange="updateItemPrice(this)">
+                        <option value="">Select Product</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" class="item-price" min="0" step="0.01" required readonly>
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" class="item-quantity" min="1" value="1" required onchange="updateItemTotal(this)">
+                </div>
+                <div class="form-group">
+                    <label>Total</label>
+                    <input type="number" class="item-total" min="0" step="0.01" required readonly>
+                </div>
+                <div class="form-group item-actions">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSaleItem(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script src="shared/js/common.js"></script>
+    <script src="js/sales.js"></script>
+</body>
+</html>
