@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj": {}
+    "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj": {
+    "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+        "projectUniqueName": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
         "projectName": "MartInventory.Api",
-        "projectPath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+        "projectPath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
         "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\obj\\",
+        "outputPath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config"
