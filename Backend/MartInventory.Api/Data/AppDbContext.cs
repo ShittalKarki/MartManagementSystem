@@ -1,5 +1,6 @@
 using MartInventory.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace MartInventory.Api.Data
 {
@@ -8,12 +9,8 @@ namespace MartInventory.Api.Data
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
 		public DbSet<Product> Products => Set<Product>();
-		public DbSet<LineOfBusiness> LinesOfBusiness => Set<LineOfBusiness>();
-		public DbSet<Department> Departments => Set<Department>();
-		public DbSet<SubDepartment> SubDepartments => Set<SubDepartment>();
-		public DbSet<ProductClass> ProductClasses => Set<ProductClass>();
-		public DbSet<Subclass> Subclasses => Set<Subclass>();
-		public DbSet<Merchandise> Merchandises => Set<Merchandise>();
+		public DbSet<Category> Categories => Set<Category>();
+		public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 		public DbSet<Vendor> Vendors => Set<Vendor>();
 		public DbSet<Customer> Customers => Set<Customer>();
 		public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();

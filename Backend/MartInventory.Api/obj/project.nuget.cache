@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fEUxspFC9sk=",
+  "dgSpecHash": "SYmJ34HRsSM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+  "projectFilePath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Dell\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.2.0\\microsoft.aspnetcore.authentication.abstractions.2.2.0.nupkg.sha512",
@@ -109,9 +109,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "MartInventory.Api depends on Microsoft.AspNetCore.SignalR.Protocols.Json (>= 9.0.0-preview.4.24267.5) but Microsoft.AspNetCore.SignalR.Protocols.Json 9.0.0-preview.4.24267.5 was not found. Microsoft.AspNetCore.SignalR.Protocols.Json 9.0.0-preview.4.24267.6 was resolved instead.",
-      "projectPath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "projectPath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "filePath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "libraryId": "Microsoft.AspNetCore.SignalR.Protocols.Json",
       "targetGraphs": [
         "net9.0"
@@ -121,9 +121,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "MartInventory.Api depends on Microsoft.EntityFrameworkCore (>= 9.0.0-preview.4.24267.5) but Microsoft.EntityFrameworkCore 9.0.0-preview.4.24267.5 was not found. Microsoft.EntityFrameworkCore 9.0.0-preview.5.24306.3 was resolved instead.",
-      "projectPath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "projectPath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "filePath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "libraryId": "Microsoft.EntityFrameworkCore",
       "targetGraphs": [
         "net9.0"
@@ -133,9 +133,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "MartInventory.Api depends on Microsoft.EntityFrameworkCore.Design (>= 9.0.0-preview.4.24267.5) but Microsoft.EntityFrameworkCore.Design 9.0.0-preview.4.24267.5 was not found. Microsoft.EntityFrameworkCore.Design 9.0.0-preview.5.24306.3 was resolved instead.",
-      "projectPath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "projectPath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "filePath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "libraryId": "Microsoft.EntityFrameworkCore.Design",
       "targetGraphs": [
         "net9.0"
@@ -145,9 +145,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "MartInventory.Api depends on Microsoft.EntityFrameworkCore.Sqlite (>= 9.0.0-preview.4.24267.5) but Microsoft.EntityFrameworkCore.Sqlite 9.0.0-preview.4.24267.5 was not found. Microsoft.EntityFrameworkCore.Sqlite 9.0.0-preview.5.24306.3 was resolved instead.",
-      "projectPath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "projectPath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "filePath": "C:\\Users\\Dell\\Desktop\\MartManagementSystem\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "libraryId": "Microsoft.EntityFrameworkCore.Sqlite",
       "targetGraphs": [
         "net9.0"

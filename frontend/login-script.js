@@ -4,111 +4,39 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeLoginPage() {
-    setupRoleSelector();
-    setupFormSubmissions();
+    setupAdminFormSubmission();
+    setupSocialAuth();
     setupAnimations();
+    setupPasswordUX();
+    setupRememberUsername();
 }
 
-// Role Selector Functionality
-function setupRoleSelector() {
-    const roleBtns = document.querySelectorAll('.role-btn');
-    const customerForm = document.getElementById('customerLoginForm');
-    const managerForm = document.getElementById('managerLoginForm');
-
-    roleBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const role = this.getAttribute('data-role');
-            
-            // Update active button
-            roleBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Show corresponding form
-            if (role === 'customer') {
-                customerForm.classList.add('active');
-                managerForm.classList.remove('active');
-            } else if (role === 'manager') {
-                managerForm.classList.add('active');
-                customerForm.classList.remove('active');
-            }
-        });
+// Admin form submission only
+function setupAdminFormSubmission() {
+    const adminForm = document.getElementById('adminLoginForm');
+    if (!adminForm) return;
+    adminForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleAdminLogin();
     });
 }
 
-// Form Submissions
-function setupFormSubmissions() {
-    // Customer Login Form
-    document.getElementById('customerLoginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleCustomerLogin();
-    });
-
-    // Manager Login Form
-    document.getElementById('managerLoginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleManagerLogin();
-    });
-
-    // Signup Form
-    document.getElementById('signupForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleSignup();
-    });
-}
-
-// Customer Login Handler
-async function handleCustomerLogin() {
-    const form = document.getElementById('customerLoginForm');
+// Admin login handler
+async function handleAdminLogin() {
+    const form = document.getElementById('adminLoginForm');
     const formData = new FormData(form);
-    
-    const loginData = {
-        email: formData.get('email'),
-        password: formData.get('password'),
-        remember: formData.get('remember') === 'on'
-    };
-
-    try {
-        showLoading(form);
-        
-        // Simulate API call - replace with actual API endpoint
-        const response = await simulateLogin(loginData, 'customer');
-        
-        if (response.success) {
-            showSuccessMessage('Login successful! Redirecting...');
-            setTimeout(() => {
-                window.location.href = 'customer-dashboard.html';
-            }, 1500);
-        } else {
-            showErrorMessage(response.message || 'Login failed. Please try again.');
-        }
-    } catch (error) {
-        showErrorMessage('An error occurred. Please try again.');
-    } finally {
-        hideLoading(form);
-    }
-}
-
-// Manager Login Handler
-async function handleManagerLogin() {
-    const form = document.getElementById('managerLoginForm');
-    const formData = new FormData(form);
-    
     const loginData = {
         username: formData.get('username'),
-        password: formData.get('password'),
-        remember: formData.get('remember') === 'on'
+        password: formData.get('password')
     };
 
     try {
         showLoading(form);
-        
-        // Simulate API call - replace with actual API endpoint
         const response = await simulateLogin(loginData, 'manager');
-        
         if (response.success) {
             showSuccessMessage('Login successful! Redirecting...');
             setTimeout(() => {
-                window.location.href = 'index.html'; // Manager dashboard
+                window.location.href = 'index.html';
             }, 1500);
         } else {
             showErrorMessage(response.message || 'Invalid credentials.');
@@ -120,67 +48,181 @@ async function handleManagerLogin() {
     }
 }
 
-// Signup Handler
-async function handleSignup() {
-    const form = document.getElementById('signupForm');
-    const formData = new FormData(form);
-    
-    const signupData = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        password: formData.get('password')
+// Firebase Social Auth (Google, Facebook, Apple via popup)
+function setupSocialAuth() {
+    // Configure your Firebase project here
+    const firebaseConfig = {
+        apiKey: window.FB_API_KEY || 'YOUR_API_KEY',
+        authDomain: window.FB_AUTH_DOMAIN || 'YOUR_AUTH_DOMAIN',
+        projectId: window.FB_PROJECT_ID || 'YOUR_PROJECT_ID',
+        appId: window.FB_APP_ID || 'YOUR_APP_ID',
     };
 
-    try {
-        showLoading(form);
-        
-        // Simulate API call - replace with actual API endpoint
-        const response = await simulateSignup(signupData);
-        
-        if (response.success) {
-            showSuccessMessage('Account created successfully! Please login.');
-            setTimeout(() => {
-                showLoginForm();
-            }, 2000);
-        } else {
-            showErrorMessage(response.message || 'Signup failed. Please try again.');
-        }
-    } catch (error) {
-        showErrorMessage('An error occurred. Please try again.');
-    } finally {
-        hideLoading(form);
+    // Only proceed if placeholders are replaced or env is provided
+    const isConfigured = Object.values(firebaseConfig).every(v => v && !String(v).includes('YOUR_'));
+    if (!isConfigured) {
+        // Bind basic disabled handlers to inform configuration required
+        ['googleSignIn','facebookSignIn','appleSignIn'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) btn.addEventListener('click', () => showErrorMessage('Social login not configured. Please set Firebase config.'));
+        });
+        return;
     }
+
+    // Load Firebase SDKs dynamically for vanilla HTML
+    const scripts = [
+        'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',
+        'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js'
+    ];
+    Promise.all(scripts.map(loadScript)).then(() => {
+        // Initialize
+        const app = window.firebase.initializeApp(firebaseConfig);
+        const auth = window.firebase.auth();
+        const apiBase = (window.API_BASE_URL || '').replace(/\/$/, '');
+
+        // Providers
+        const googleProvider = new window.firebase.auth.GoogleAuthProvider();
+        const facebookProvider = new window.firebase.auth.FacebookAuthProvider();
+        const appleProvider = new window.firebase.auth.OAuthProvider('apple.com');
+        const microsoftProvider = new window.firebase.auth.OAuthProvider('microsoft.com');
+
+        const verifyAdmin = async (idToken) => {
+            const resp = await fetch(`${apiBase}/api/auth/verify-admin`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken })
+            });
+            if (!resp.ok) {
+                const err = await safeJson(resp);
+                throw new Error(err?.message || 'Verification failed');
+            }
+            const data = await resp.json();
+            if (!data.success) throw new Error(data.message || 'Not an admin');
+            return data;
+        };
+
+        const attach = (id, provider, opts = {}) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.addEventListener('click', async () => {
+                try {
+                    showLoading(btn.closest('form'));
+                    const result = await auth.signInWithPopup(provider);
+                    const user = result.user;
+                    if (!user) throw new Error('No user returned');
+                    const idToken = await user.getIdToken();
+                    await verifyAdmin(idToken);
+                    showSuccessMessage('Login successful! Redirecting...');
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+                } catch (err) {
+                    showErrorMessage(err.message || 'Social login failed');
+                } finally {
+                    hideLoading(btn.closest('form'));
+                }
+            });
+        };
+
+        attach('googleSignIn', googleProvider);
+        attach('facebookSignIn', facebookProvider);
+        attach('appleSignIn', appleProvider);
+        attach('microsoftSignIn', microsoftProvider);
+    }).catch(() => {
+        ['googleSignIn','facebookSignIn','appleSignIn'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) btn.addEventListener('click', () => showErrorMessage('Failed to load auth SDK.'));
+        });
+    });
 }
 
-// Guest Access
-function accessAsGuest() {
-    showSuccessMessage('Welcome! You can browse products as a guest.');
-    setTimeout(() => {
-        window.location.href = 'customer-dashboard.html?guest=true';
-    }, 1500);
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
 }
 
-// Form Navigation
-function showSignupForm() {
-    document.querySelectorAll('.login-form').forEach(form => form.classList.remove('active'));
-    document.getElementById('signupForm').classList.add('active');
-    
-    // Update subtitle
-    document.querySelector('.subtitle').textContent = 'Create your Daily Deals account';
+async function safeJson(resp) {
+    try { return await resp.json(); } catch { return null; }
 }
 
-function showLoginForm() {
-    document.querySelectorAll('.login-form').forEach(form => form.classList.remove('active'));
-    document.getElementById('customerLoginForm').classList.add('active');
-    
-    // Reset role selector to customer
-    document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector('[data-role="customer"]').classList.add('active');
-    
-    // Update subtitle
-    document.querySelector('.subtitle').textContent = 'Choose how you\'d like to access Daily Deals';
+// Password and Remember Username UX
+function setupPasswordUX() {
+    const pwd = document.getElementById('adminPassword');
+    const toggle = document.getElementById('togglePassword');
+    const strength = document.getElementById('passwordStrength');
+    const caps = document.getElementById('capsWarning');
+    if (!pwd) return;
+
+    // toggle visibility
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+            const show = pwd.type === 'password';
+            pwd.type = show ? 'text' : 'password';
+            toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            const icon = toggle.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            }
+        });
+    }
+
+    // strength indicator
+    const computeStrength = (value) => {
+        let score = 0;
+        if (value.length >= 8) score++;
+        if (/[A-Z]/.test(value)) score++;
+        if (/[0-9]/.test(value)) score++;
+        if (/[^A-Za-z0-9]/.test(value)) score++;
+        return Math.min(score, 4);
+    };
+
+    pwd.addEventListener('input', () => {
+        const level = computeStrength(pwd.value);
+        if (strength) {
+            strength.dataset.level = String(level);
+            strength.setAttribute('aria-hidden', 'false');
+        }
+    });
+
+    // caps lock warning
+    pwd.addEventListener('keydown', (e) => {
+        if (!caps) return;
+        const isCaps = e.getModifierState && e.getModifierState('CapsLock');
+        caps.style.display = isCaps ? 'inline-flex' : 'none';
+    });
+    pwd.addEventListener('blur', () => { if (caps) caps.style.display = 'none'; });
 }
+
+function setupRememberUsername() {
+    const input = document.getElementById('adminUsername');
+    const remember = document.getElementById('rememberUsername');
+    if (!input || !remember) return;
+
+    // load
+    const saved = localStorage.getItem('admin_username');
+    if (saved) {
+        input.value = saved;
+        remember.checked = true;
+    }
+
+    // save on change / submit
+    const form = document.getElementById('adminLoginForm');
+    const persist = () => {
+        if (remember.checked) {
+            localStorage.setItem('admin_username', input.value.trim());
+        } else {
+            localStorage.removeItem('admin_username');
+        }
+    };
+    input.addEventListener('change', persist);
+    if (form) form.addEventListener('submit', persist);
+}
+
+// Remove guest/sign-up/navigation features; admin only
 
 // Loading States
 function showLoading(form) {

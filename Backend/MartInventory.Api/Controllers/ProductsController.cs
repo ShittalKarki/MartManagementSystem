@@ -2,6 +2,9 @@ using MartInventory.Api.Data;
 using MartInventory.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MartInventory.Api.Controllers
 {
@@ -17,18 +20,27 @@ namespace MartInventory.Api.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Product>>> GetAll()
-		{
-			return await _db.Products.Include(p => p.Merchandise).ToListAsync();
-		}
+	public async Task<ActionResult<IEnumerable<Product>>> GetAll()
+	{
+		return await _db.Products.Include(p => p.Category).ToListAsync();
+	}
+	
+	[HttpGet("low-stock")]
+	public async Task<ActionResult<IEnumerable<Product>>> GetLowStockProducts()
+	{
+		return await _db.Products
+			.Include(p => p.Category)
+			.Where(p => p.StockOnHand <= p.ReorderLevel)
+			.ToListAsync();
+	}
 
 		[HttpGet("{id}")]
-		public async Task<ActionResult<Product>> GetById(int id)
-		{
-			var product = await _db.Products.Include(p => p.Merchandise).FirstOrDefaultAsync(p => p.Id == id);
-			if (product == null) return NotFound();
-			return product;
-		}
+	public async Task<ActionResult<Product>> GetById(int id)
+	{
+		var product = await _db.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+		if (product == null) return NotFound();
+		return product;
+	}
 
 		[HttpPost]
 		public async Task<ActionResult<Product>> Create(Product product)

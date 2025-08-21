@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - Daily Deals Inventory Management</title>
+    
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="shared/styles/main.css">
+    <link rel="stylesheet" href="shared/styles/inventory.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-store"></i>    
+                <h1>Daily Deals</h1>
+                <span class="subtitle">Inventory System</span>
+            </div>
+            <nav class="side-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-boxes"></i> <span>Products</span>
+                </a>
+                <a href="sales.html" class="nav-item">
+                    <i class="fas fa-cash-register"></i> <span>Sales</span>
+                </a>
+                <a href="purchases.html" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i> <span>Purchases</span>
+                </a>
+                <a href="inventory.html" class="nav-item active">
+                    <i class="fas fa-warehouse"></i> <span>Inventory</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i> <span>Reports</span>
+                </a>
+                <a href="suppliers.html" class="nav-item">
+                    <i class="fas fa-truck"></i> <span>Suppliers</span>
+                </a>
+                <a href="login.html" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper">
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h2>Inventory Management</h2>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="showStockAdjustmentModal()">
+                    <i class="fas fa-edit"></i> Adjust Stock
+                </button>
+            </div>
+        </header>
+
+        <!-- Inventory Tabs -->
+        <div class="tabs">
+            <div class="tab-header">
+                <div class="tab-item active" data-tab="stock-movements">Stock Movements</div>
+                <div class="tab-item" data-tab="low-stock">Low Stock</div>
+            </div>
+            <div class="tab-content">
+                <!-- Stock Movements Tab -->
+                <div class="tab-pane active" id="stock-movements">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Product</th>
+                                        <th>Type</th>
+                                        <th>Quantity</th>
+                                        <th>Reference</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stockMovementsTableBody">
+                                    <!-- Stock movements will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Low Stock Tab -->
+                <div class="tab-pane" id="low-stock">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                        <th>Current Stock</th>
+                                        <th>Minimum Stock</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lowStockTableBody">
+                                    <!-- Low stock products will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Stock Adjustment Modal -->
+    <div id="stockAdjustmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Stock Adjustment</h3>
+                <span class="close" onclick="closeStockAdjustmentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="stockAdjustmentForm">
+                    <div class="form-group">
+                        <label for="adjustmentProduct">Product</label>
+                        <select id="adjustmentProduct" class="form-control" onchange="updateCurrentStock()" required>
+                            <option value="">Select Product</option>
+                            <!-- Products will be loaded here -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Current Stock</label>
+                        <input type="text" id="currentStock" class="form-control" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adjustmentType">Adjustment Type</label>
+                        <select id="adjustmentType" class="form-control" required>
+                            <option value="">Select Type</option>
+                            <option value="add">Add Stock</option>
+                            <option value="remove">Remove Stock</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adjustmentQuantity">Quantity</label>
+                        <input type="number" id="adjustmentQuantity" class="form-control" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adjustmentReason">Reason</label>
+                        <select id="adjustmentReason" class="form-control" required>
+                            <option value="">Select Reason</option>
+                            <option value="Damaged">Damaged</option>
+                            <option value="Expired">Expired</option>
+                            <option value="Inventory Count">Inventory Count</option>
+                            <option value="Return">Return</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adjustmentNotes">Notes</label>
+                        <textarea id="adjustmentNotes" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeStockAdjustmentModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Adjustment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i id="toast-icon" class="fas"></i>
+            <div class="toast-message" id="toast-message"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="shared/js/common.js"></script>
+    <script src="js/inventory.js"></script>
+        </div> <!-- Close content-wrapper -->
+    </div> <!-- Close container -->
+</body>
+</html>

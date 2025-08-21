@@ -10,10 +10,11 @@ namespace MartInventory.Api.Models
 		public string? Barcode { get; set; }
 		public decimal PurchasePrice { get; set; }
 		public decimal SellingPrice { get; set; }
+		public decimal VatPercent { get; set; } = 13; // Default VAT in Nepal
 		public int StockOnHand { get; set; }
 		public int ReorderLevel { get; set; } = 10;
-		public int MerchandiseId { get; set; }
-		public Merchandise Merchandise { get; set; } = null!;
+		public int CategoryId { get; set; }
+		public Category Category { get; set; } = null!;
 	}
 }
 

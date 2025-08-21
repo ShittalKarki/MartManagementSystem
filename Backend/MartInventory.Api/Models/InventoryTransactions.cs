@@ -33,6 +33,7 @@ namespace MartInventory.Api.Models
 		public List<SalesOrderLine> Lines { get; set; } = new();
 		public decimal Subtotal { get; set; }
 		public decimal DiscountAmount { get; set; }
+		public decimal VatAmount { get; set; }
 		public decimal TotalAmount { get; set; }
 		public string Currency { get; set; } = "NPR";
 		public string InvoiceNumber { get; set; } = string.Empty;
@@ -48,6 +49,7 @@ namespace MartInventory.Api.Models
 		public int Quantity { get; set; }
 		public decimal UnitPrice { get; set; }
 		public decimal DiscountPercent { get; set; }
+		public decimal VatPercent { get; set; }
 		public decimal LineTotal { get; set; }
 	}
 
