@@ -1,3 +1,5 @@
+/* MartMS */
+// Legacy inventory dashboard — main entry and API helpers.
 // Global variables
 let connection;
 let products = [];
@@ -19,7 +21,7 @@ async function loadCategories() {
         }
     } catch (error) {
         console.error('Error loading categories:', error);
-        showToast('Failed to load categories', 'error');
+        showToast('Unable to load categories. Please refresh.', 'error');
     }
 }
 
