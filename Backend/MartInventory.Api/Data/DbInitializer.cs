@@ -7,7 +7,22 @@ namespace MartInventory.Api.Data
 	{
 		public static async Task InitializeAsync(AppDbContext db)
 		{
-			await db.Database.MigrateAsync();
+			var created = await db.Database.EnsureCreatedAsync();
+			var schemaReady = true;
+			try
+			{
+				_ = db.LinesOfBusiness.Take(1).Any();
+			}
+			catch
+			{
+				schemaReady = false;
+			}
+
+			if (!created && !schemaReady)
+			{
+				await db.Database.EnsureDeletedAsync();
+				await db.Database.EnsureCreatedAsync();
+			}
 			if (!db.LinesOfBusiness.Any())
 			{
 				var lobGrocery = new LineOfBusiness { Name = "Grocery & Food" };
@@ -48,11 +63,17 @@ namespace MartInventory.Api.Data
 				db.Merchandises.AddRange(merch1, merch2, merch3, merch4);
 				await db.SaveChangesAsync();
 
+				var catBakery = new Category { Name = "Bakery" };
+				var catMeat = new Category { Name = "Meat & Seafood" };
+				var catPersonal = new Category { Name = "Personal Care" };
+				db.Categories.AddRange(catBakery, catMeat, catPersonal);
+				await db.SaveChangesAsync();
+
 				db.Products.AddRange(
-					new Product { Sku = "BREAD-WHEAT-001", Name = "Whole Wheat Bread", MerchandiseId = merch1.Id, PurchasePrice = 60, SellingPrice = 80, StockOnHand = 50, ReorderLevel = 20 },
-					new Product { Sku = "BREAD-WHITE-001", Name = "White Bread", MerchandiseId = merch2.Id, PurchasePrice = 50, SellingPrice = 70, StockOnHand = 60, ReorderLevel = 20 },
-					new Product { Sku = "MEAT-CHICK-001", Name = "Chicken Breast (kg)", Unit = "kg", MerchandiseId = merch3.Id, PurchasePrice = 350, SellingPrice = 450, StockOnHand = 30, ReorderLevel = 10 },
-					new Product { Sku = "SOAP-HERB-001", Name = "Herbal Soap", MerchandiseId = merch4.Id, PurchasePrice = 30, SellingPrice = 45, StockOnHand = 100, ReorderLevel = 25 }
+					new Product { Sku = "BREAD-WHEAT-001", Name = "Whole Wheat Bread", CategoryId = catBakery.Id, MerchandiseId = merch1.Id, PurchasePrice = 60, SellingPrice = 80, StockOnHand = 50, ReorderLevel = 20 },
+					new Product { Sku = "BREAD-WHITE-001", Name = "White Bread", CategoryId = catBakery.Id, MerchandiseId = merch2.Id, PurchasePrice = 50, SellingPrice = 70, StockOnHand = 60, ReorderLevel = 20 },
+					new Product { Sku = "MEAT-CHICK-001", Name = "Chicken Breast (kg)", Unit = "kg", CategoryId = catMeat.Id, MerchandiseId = merch3.Id, PurchasePrice = 350, SellingPrice = 450, StockOnHand = 30, ReorderLevel = 10 },
+					new Product { Sku = "SOAP-HERB-001", Name = "Herbal Soap", CategoryId = catPersonal.Id, MerchandiseId = merch4.Id, PurchasePrice = 30, SellingPrice = 45, StockOnHand = 100, ReorderLevel = 25 }
 				);
 				await db.SaveChangesAsync();
 

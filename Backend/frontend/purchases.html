@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchases - Daily Deals Inventory Management</title>
+    
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="shared/styles/main.css">
+    <link rel="stylesheet" href="shared/styles/purchases.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <h1>Daily Deals</h1>
+                <span class="subtitle">Inventory System</span>
+            </div>
+            <nav class="side-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-boxes"></i> <span>Products</span>
+                </a>
+                <a href="sales.html" class="nav-item">
+                    <i class="fas fa-cash-register"></i> <span>Sales</span>
+                </a>
+                <a href="purchases.html" class="nav-item active">
+                    <i class="fas fa-shopping-cart"></i> <span>Purchases</span>
+                </a>
+                <a href="inventory.html" class="nav-item">
+                    <i class="fas fa-warehouse"></i> <span>Inventory</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i> <span>Reports</span>
+                </a>
+                <a href="suppliers.html" class="nav-item">
+                    <i class="fas fa-truck"></i> <span>Suppliers</span>
+                </a>
+                <a href="login.html" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h2>Purchases</h2>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="showPurchaseModal()">
+                    <i class="fas fa-plus"></i> New Purchase
+                </button>
+            </div>
+        </header>
+
+        <!-- Purchases Table -->
+        <div class="card">
+            <div class="card-body">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>Supplier</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchasesTableBody">
+                        <!-- Purchase data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Purchase Modal -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>New Purchase Order</h3>
+                <span class="close" onclick="closePurchaseModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="purchaseForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="purchaseSupplier">Supplier</label>
+                            <select id="purchaseSupplier" class="form-control" required>
+                                <option value="">Select Supplier</option>
+                                <!-- Suppliers will be loaded here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchaseDate">Date</label>
+                            <input type="date" id="purchaseDate" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h4>Items</h4>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="addPurchaseItem()">
+                                <i class="fas fa-plus"></i> Add Item
+                            </button>
+                        </div>
+                        <div id="purchaseItemsContainer">
+                            <!-- Purchase items will be added here -->
+                        </div>
+                    </div>
+
+                    <div class="form-section summary-section">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="purchaseSubtotal">NPR 0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>VAT (13%):</span>
+                            <span id="purchaseVat">NPR 0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="purchaseTotal">NPR 0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closePurchaseModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Purchase</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Details Modal -->
+    <div id="purchaseDetailsModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>Purchase Order Details</h3>
+                <span class="close" onclick="closePurchaseDetailsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="details-header">
+                    <div class="details-row">
+                        <span class="details-label">PO Number:</span>
+                        <span id="detailsPoNumber" class="details-value"></span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">Date:</span>
+                        <span id="detailsDate" class="details-value"></span>
+                    </div>
+                    <div class="details-row">
+                        <span class="details-label">Supplier:</span>
+                        <span id="detailsSupplier" class="details-value"></span>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h4>Items</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchaseDetailsTableBody">
+                            <!-- Purchase items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="details-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="detailsSubtotal"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>VAT (13%):</span>
+                        <span id="detailsVat"></span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="detailsTotal"></span>
+                    </div>
+                </div>
+
+                <div class="details-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closePurchaseDetailsModal()">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="printPurchaseDetails()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Item Template -->
+    <template id="purchaseItemTemplate">
+        <div class="item-row">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Product</label>
+                    <select class="form-control product-select" onchange="updateItemPrice(this)" required>
+                        <option value="">Select Product</option>
+                        <!-- Products will be loaded here -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" class="form-control item-price" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" class="form-control item-quantity" value="1" min="1" onchange="updateItemTotal(this)" required>
+                </div>
+                <div class="form-group">
+                    <label>Total</label>
+                    <input type="number" class="form-control item-total" step="0.01" min="0" readonly>
+                </div>
+                <div class="form-group item-actions">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removePurchaseItem(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i id="toast-icon" class="fas"></i>
+            <div class="toast-message" id="toast-message"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="shared/js/common.js"></script>
+    <script src="js/purchases.js"></script>
+        </div> <!-- Close content-wrapper -->
+    </div> <!-- Close container -->
+</body>
+</html>

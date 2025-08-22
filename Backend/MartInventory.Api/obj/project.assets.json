@@ -5526,19 +5526,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Dell\\.nuget\\packages\\": {}
+    "C:\\Users\\ACER\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "projectUniqueName": "C:\\Users\\ACER\\Downloads\\prototype1\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
       "projectName": "MartInventory.Api",
-      "projectPath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
-      "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Dell\\Desktop\\mart inventory management\\Backend\\MartInventory.Api\\obj\\",
+      "projectPath": "C:\\Users\\ACER\\Downloads\\prototype1\\mart inventory management\\Backend\\MartInventory.Api\\MartInventory.Api.csproj",
+      "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ACER\\Downloads\\prototype1\\mart inventory management\\Backend\\MartInventory.Api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"

@@ -1,0 +1,29 @@
+@page "/reports.html"
+@using Microsoft.AspNetCore.Hosting
+@inject IWebHostEnvironment WebHostEnvironment
+@{
+    Layout = null;
+    var filePath = System.IO.Path.Combine(WebHostEnvironment.ContentRootPath, "..", "frontend", "reports.html");
+    var htmlContent = System.IO.File.ReadAllText(filePath);
+    
+    // Fix asset paths to be absolute
+    htmlContent = htmlContent.Replace("href=\"styles.css\"", "href=\"/styles.css\"");
+    htmlContent = htmlContent.Replace("src=\"script.js\"", "src=\"/script.js\"");
+    htmlContent = htmlContent.Replace("href=\"shared/styles/", "href=\"/shared/styles/");
+    htmlContent = htmlContent.Replace("src=\"shared/js/", "src=\"/shared/js/");
+    htmlContent = htmlContent.Replace("src=\"js/", "src=\"/js/");
+    htmlContent = htmlContent.Replace("href=\"shared/layout.html\"", "href=\"/shared/layout.html\"");
+    
+    // Fix navigation links to work with Razor Pages
+    htmlContent = htmlContent.Replace("href=\"dashboard.html\"", "href=\"/dashboard.html\"");
+    htmlContent = htmlContent.Replace("href=\"products.html\"", "href=\"/products.html\"");
+    htmlContent = htmlContent.Replace("href=\"sales.html\"", "href=\"/sales.html\"");
+    htmlContent = htmlContent.Replace("href=\"purchases.html\"", "href=\"/purchases.html\"");
+    htmlContent = htmlContent.Replace("href=\"inventory.html\"", "href=\"/inventory.html\"");
+    htmlContent = htmlContent.Replace("href=\"reports.html\"", "href=\"/reports.html\"");
+    htmlContent = htmlContent.Replace("href=\"suppliers.html\"", "href=\"/suppliers.html\"");
+    htmlContent = htmlContent.Replace("href=\"login.html\"", "href=\"/login.html\"");
+}
+@Html.Raw(htmlContent)
+
+

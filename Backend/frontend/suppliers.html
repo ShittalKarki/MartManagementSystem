@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppliers - Daily Deals Inventory Management</title>
+    
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="shared/styles/main.css">
+    <link rel="stylesheet" href="shared/styles/suppliers.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <h1>Daily Deals</h1>
+                <span class="subtitle">Inventory System</span>
+            </div>
+            <nav class="side-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-boxes"></i> <span>Products</span>
+                </a>
+                <a href="sales.html" class="nav-item">
+                    <i class="fas fa-cash-register"></i> <span>Sales</span>
+                </a>
+                <a href="purchases.html" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i> <span>Purchases</span>
+                </a>
+                <a href="inventory.html" class="nav-item">
+                    <i class="fas fa-warehouse"></i> <span>Inventory</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i> <span>Reports</span>
+                </a>
+                <a href="suppliers.html" class="nav-item active">
+                    <i class="fas fa-truck"></i> <span>Suppliers</span>
+                </a>
+                <a href="login.html" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper">
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">
+                <h2>Suppliers</h2>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="showAddSupplierModal()">
+                    <i class="fas fa-plus"></i> Add Supplier
+                </button>
+            </div>
+        </header>
+
+        <!-- Suppliers List -->
+        <div class="card">
+            <div class="card-body">
+                <table class="data-table" id="suppliersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact Person</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Supplier data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Supplier Modal -->
+    <div class="modal" id="supplierModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Supplier</h3>
+                <span class="close" onclick="hideSupplierModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="supplierForm">
+                    <input type="hidden" id="supplierId">
+                    
+                    <div class="form-group">
+                        <label for="supplierName">Supplier Name*</label>
+                        <input type="text" id="supplierName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contactPerson">Contact Person</label>
+                            <input type="text" id="contactPerson" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone*</label>
+                            <input type="tel" id="phone" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea id="address" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State/Province</label>
+                            <input type="text" id="state" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code</label>
+                            <input type="text" id="postalCode" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <input type="text" id="country" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="hideSupplierModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier Details Modal -->
+    <div class="modal" id="supplierDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detailsModalTitle">Supplier Details</h3>
+                <span class="close" onclick="hideSupplierDetailsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="supplier-details">
+                    <div class="supplier-info">
+                        <h4 id="detailsSupplierName"></h4>
+                        <p id="detailsContactPerson"></p>
+                        <p id="detailsPhone"></p>
+                        <p id="detailsEmail"></p>
+                        <p id="detailsAddress"></p>
+                    </div>
+                    
+                    <div class="supplier-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Purchases</span>
+                            <span class="stat-value" id="detailsTotalPurchases">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Last Purchase</span>
+                            <span class="stat-value" id="detailsLastPurchase">N/A</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recent-purchases">
+                    <h4>Recent Purchases</h4>
+                    <table class="data-table" id="supplierPurchasesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Purchase #</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Recent purchases will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideSupplierDetailsModal()">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="editSupplier()">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteConfirmModal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3>Confirm Delete</h3>
+                <span class="close" onclick="hideDeleteConfirmModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this supplier?</p>
+                <p class="warning-text">This action cannot be undone.</p>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideDeleteConfirmModal()">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeleteSupplier()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i id="toast-icon" class="fas"></i>
+            <div class="toast-message" id="toast-message"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="shared/js/common.js"></script>
+    <script src="js/suppliers.js"></script>
+        </div> <!-- Close content-wrapper -->
+    </div> <!-- Close container -->
+</body>
+</html>

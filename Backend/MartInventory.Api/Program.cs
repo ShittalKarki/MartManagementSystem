@@ -11,6 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<InventoryService>();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAll", policy =>
@@ -25,7 +26,24 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
+
+// Serve static files from the frontend directory
+var frontendPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "frontend"));
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(frontendPath),
+    RequestPath = ""
+});
+
+// Also serve static files from wwwroot if it exists
+app.UseStaticFiles();
+
 app.MapControllers();
+app.MapRazorPages();
+app.MapGet("/", context => {
+    context.Response.Redirect("/login.html");
+    return Task.CompletedTask;
+});
 app.MapHub<InventoryHub>("/hubs/inventory");
 
 using (var scope = app.Services.CreateScope())

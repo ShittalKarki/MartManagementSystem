@@ -17,13 +17,65 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = MartInventory.Api
 build_property.RootNamespace = MartInventory.Api
-build_property.ProjectDir = C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\
+build_property.ProjectDir = C:\Users\ACER\Downloads\prototype1\mart inventory management\Backend\MartInventory.Api\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api
+build_property.MSBuildProjectDirectory = C:\Users\ACER\Downloads\prototype1\mart inventory management\Backend\MartInventory.Api
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/CustomerDashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJEYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Inventory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50b3J5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Products.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Purchases.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHVyY2hhc2VzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Reports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Sales.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/Suppliers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VwcGxpZXJzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ACER/Downloads/prototype1/mart inventory management/Backend/MartInventory.Api/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
