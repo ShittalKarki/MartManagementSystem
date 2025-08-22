@@ -1,266 +1,144 @@
-# Daily Deals - Inventory Management System
+# Mart Management System
 
-A comprehensive web-based inventory management system designed specifically for marts and retail stores in Nepal. The system provides real-time inventory tracking, purchase and sales management, automated alerts, and professional invoicing capabilities.
+A full-stack **ASP.NET Core MVC** application for retail mart operations: products, inventory, purchases, sales/billing, customers, suppliers, reports, and role-based user management.
 
-## 🌟 Features
+## Tech Stack
 
-### Core Inventory Management
-- **Product Management**: Complete CRUD operations for products with SKU and barcode support
-- **Category Hierarchy**: Sophisticated product categorization following retail standards:
-  - Line of Business (LOB)
-  - Department
-  - Sub-Department
-  - Product Class
-  - Subclass
-  - Merchandise
-- **Stock Control**: Real-time stock tracking with reorder level alerts
-- **Multi-unit Support**: Flexible unit management (pcs, kg, liters, etc.)
+| Layer | Technology |
+|-------|------------|
+| Backend | ASP.NET Core MVC 9, C# |
+| ORM | Entity Framework Core 9 |
+| Database | SQL Server (LocalDB by default) |
+| Frontend | Razor Views, Bootstrap 5, JavaScript, Chart.js |
+| Export | ClosedXML (Excel) |
 
-### Purchase Management
-- **Wholesale Purchases**: Create purchase orders from vendors/warehouses
-- **Vendor Management**: Maintain vendor information and contact details
-- **Automated Stock Updates**: Inventory automatically updates when purchases are recorded
-- **Purchase Invoices**: Generate professional purchase invoices with unique numbers
-
-### Sales Management
-- **Retail & Bulk Sales**: Handle both individual and bulk customer orders
-- **Customer Management**: Track customer information and purchase history
-- **Discount System**: Flexible discount percentages for bulk orders and promotions
-- **Sales Invoices**: Professional sales invoices with discount calculations
-- **NPR Currency**: Native support for Nepali Rupees
-
-### Real-time Features
-- **Live Updates**: SignalR integration for real-time stock updates
-- **Low Stock Alerts**: Automatic notifications when products reach reorder levels
-- **Dashboard Monitoring**: Real-time statistics and alerts display
-
-### Professional Interface
-- **Modern Design**: Clean, professional interface with light color schemes
-- **Responsive Layout**: Fully responsive design for all device sizes
-- **Intuitive Navigation**: Tab-based interface for easy access to all features
-- **Visual Feedback**: Toast notifications and loading states
-
-## 🏗️ Architecture
-
-### Backend (ASP.NET Core Web API)
-- **Framework**: .NET 9.0
-- **Database**: SQLite with Entity Framework Core
-- **Real-time**: SignalR for live updates
-- **API Documentation**: Swagger/OpenAPI integration
-- **CORS**: Configured for frontend integration
-
-### Frontend (HTML/CSS/JavaScript)
-- **Vanilla JavaScript**: No framework dependencies
-- **Modern CSS**: CSS Grid, Flexbox, and custom properties
-- **Responsive Design**: Mobile-first approach
-- **SignalR Client**: Real-time communication with backend
-
-## 📁 Project Structure
+## Project Structure
 
 ```
-├── Backend/
-│   └── MartInventory.Api/
-│       ├── Controllers/          # API endpoints
-│       ├── Data/                 # Database context and initializer
-│       ├── Models/               # Entity models
-│       ├── Services/             # Business logic
-│       ├── Hubs/                 # SignalR hubs
-│       └── Program.cs            # Application configuration
-├── frontend/
-│   ├── login.html               # Login page with role selection
-│   ├── login-styles.css         # Login page styling
-│   ├── login-script.js          # Login page functionality
-│   ├── index.html               # Manager dashboard interface
-│   ├── styles.css               # Manager dashboard styling
-│   ├── script.js                # Manager dashboard logic
-│   ├── customer-dashboard.html  # Customer shopping interface
-│   ├── customer-styles.css      # Customer dashboard styling
-│   └── customer-script.js       # Customer dashboard functionality
-└── README.md                    # This file
+MartManagementSystem/
+├── MartManagement.Web/          # Main MVC application (run this)
+│   ├── Controllers/
+│   ├── Models/
+│   ├── ViewModels/
+│   ├── Views/
+│   ├── Services/
+│   ├── Data/
+│   ├── Migrations/
+│   ├── Helpers/
+│   ├── Middleware/
+│   └── wwwroot/
+├── Backend/MartInventory.Api/   # Legacy Web API (optional)
+└── frontend/                    # Legacy static HTML (optional)
 ```
 
-## 🚀 Getting Started
+## Prerequisites
 
-### Prerequisites
-- .NET 9.0 SDK
-- Modern web browser
-- Code editor (VS Code, Visual Studio, etc.)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download)
+- [SQL Server](https://www.microsoft.com/sql-server) or **SQL Server LocalDB** (included with Visual Studio)
 
-### Backend Setup
-1. Navigate to the backend directory:
-   ```bash
-   cd Backend/MartInventory.Api
-   ```
+## Setup Instructions
 
-2. Restore NuGet packages:
-   ```bash
-   dotnet restore
-   ```
+### 1. Clone and open
 
-3. Build the project:
-   ```bash
-   dotnet build
-   ```
+```bash
+git clone <your-repo-url>
+cd MartManagementSystem
+```
 
-4. Run the application:
-   ```bash
-   dotnet run
-   ```
+### 2. Configure database connection
 
-5. Access the API at: `http://localhost:5000`
-6. Access Swagger documentation at: `http://localhost:5000/swagger`
+Edit `MartManagement.Web/appsettings.json`:
 
-### Frontend Setup
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=MartManagementDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+}
+```
 
-#### Manager Dashboard
-1. Open the `frontend/index.html` file in a web browser
-2. The application will automatically connect to the backend API
-3. Ensure the backend is running for full functionality
+For full SQL Server, use:
 
-#### Customer Dashboard
-1. Open the `frontend/login.html` file in a web browser
-2. Choose "Customer" role or "Continue as Guest"
-3. Browse products by category, search, and add items to cart
-4. Complete checkout process with delivery information
+```json
+"DefaultConnection": "Server=YOUR_SERVER;Database=MartManagementDb;User Id=sa;Password=YOUR_PASSWORD;TrustServerCertificate=True"
+```
 
-#### Login System
-- **Customer Access**: Browse products, manage cart, place orders
-- **Manager Access**: Full inventory management capabilities
-- **Guest Mode**: Browse and order without account creation
+### 3. Apply database migrations
 
-## 📊 Database Schema
+```bash
+cd MartManagement.Web
+dotnet ef database update
+```
 
-### Core Entities
-- **Products**: SKU, name, description, prices, stock levels
-- **Category Hierarchy**: Complete product categorization system
-- **Vendors**: Supplier information and contact details
-- **Customers**: Customer profiles and contact information
+On first run, the app applies migrations and creates **default roles + admin account** only. Optional demo catalog: set `"SeedDemoData": true` in `appsettings.json`.
 
-### Transaction Entities
-- **Purchase Orders**: Wholesale purchases with line items
-- **Sales Orders**: Customer sales with discount support
-- **Inventory Alerts**: Low stock notifications and tracking
+### 4. Run the application
 
-## 🔌 API Endpoints
+```bash
+dotnet run --project MartManagement.Web
+```
 
-### Products
-- `GET /api/products` - Get all products
-- `GET /api/products/{id}` - Get product by ID
-- `POST /api/products` - Create new product
-- `PUT /api/products/{id}` - Update product
-- `DELETE /api/products/{id}` - Delete product
+Open the URL shown in the console (typically `https://localhost:7xxx`).
 
-### Orders
-- `POST /api/orders/purchase` - Create purchase order
-- `GET /api/orders/purchase/{id}` - Get purchase order
-- `POST /api/orders/sale` - Create sales order
-- `GET /api/orders/sale/{id}` - Get sales order
-- `GET /api/orders/alerts` - Get inventory alerts
-- `POST /api/orders/alerts/{id}/resolve` - Resolve alert
+## Default Login Credentials
 
-### Reference Data
-- `GET /api/referencedata/categories` - Get category hierarchy
-- `GET /api/referencedata/vendors` - Get all vendors
-- `GET /api/referencedata/customers` - Get all customers
+| Role | Username | Password |
+|------|----------|----------|
+| **Admin** | `admin` | `Admin@123` |
+| **Staff** | `staff` | `Staff@123` |
+| **Customer** | `customer` | `Customer@123` |
 
-## 🎨 UI Features
+> Change these passwords after deployment.
 
-### Dashboard
-- **Statistics Cards**: Total products, low stock alerts, daily sales/purchases
-- **Recent Alerts**: Live low stock notifications
-- **Quick Actions**: Fast access to common operations
+## Roles (simplified for demo)
 
-### Product Management
-- **Data Tables**: Sortable product listings
-- **Search & Filter**: Easy product discovery
-- **Bulk Operations**: Efficient product management
+| Role | What they can do |
+|------|------------------|
+| **Admin** | Full store management: products, categories, inventory, purchases, suppliers, reports, users, sales |
+| **Staff** | Daily operations: create sales/billing, view products, update stock — no user or catalog management |
+| **Customer** | Online shop: browse products, cart checkout, order history, profile |
 
-### Purchase & Sales
-- **Dynamic Forms**: Add/remove line items dynamically
-- **Auto-calculations**: Automatic totals and discounts
-- **Invoice Generation**: Professional invoice numbers
+## Features
 
-## 🔒 Security Features
+- **Authentication**: Cookie-based login, customer registration, role-based navigation (Admin / Staff / Customer)
+- **Dashboard**: Admin KPIs + chart; Staff quick billing; Customer order portal
+- **Products**: CRUD, image upload, search, pagination, barcode field
+- **Categories / Suppliers / Customers**: Full CRUD with validation
+- **Sales & Billing**: Multi-line invoices, tax & discount, printable invoice, stock deduction
+- **Purchases**: Supplier orders, automatic stock increase
+- **Inventory**: Stock levels, adjustments, movement history, low-stock alerts
+- **Reports**: Sales analytics, product stock report, Excel export
+- **Users** (Admin): Manage admin and staff accounts only
+- **Customer shop**: Session cart, checkout creates invoice and reduces stock
+- **UI**: Clean responsive layout — admin/staff sidebar + separate customer shop navbar
 
-- **CORS Configuration**: Secure cross-origin requests
-- **Input Validation**: Server-side data validation
-- **Error Handling**: Comprehensive error management
-- **Logging**: Application activity logging
+## EF Core Commands Reference
 
-## 📱 Responsive Design
+```bash
+cd MartManagement.Web
 
-- **Mobile-First**: Optimized for mobile devices
-- **Tablet Support**: Responsive layouts for tablets
-- **Desktop Experience**: Full-featured desktop interface
-- **Touch-Friendly**: Optimized for touch interactions
+# Add a new migration after model changes
+dotnet ef migrations add MigrationName
 
-## 🚀 Deployment
+# Update database
+dotnet ef database update
 
-### Backend Deployment
-- **Self-Hosted**: Run on Windows/Linux servers
-- **Container Support**: Docker containerization ready
-- **Database**: SQLite for development, SQL Server for production
+# Remove last migration (if not applied)
+dotnet ef migrations remove
+```
 
-### Frontend Deployment
-- **Static Hosting**: Deploy to any web server
-- **CDN Ready**: Optimized for content delivery networks
-- **PWA Ready**: Progressive web app capabilities
+## Building for Submission
 
-## 🔧 Configuration
+```bash
+dotnet build MartManagement.Web/MartManagement.Web.csproj
+dotnet run --project MartManagement.Web
+```
 
-### Backend Configuration
-- **Database Connection**: Configure in `appsettings.json`
-- **CORS Policy**: Customize allowed origins
-- **Logging Levels**: Adjust logging verbosity
+## Security Notes
 
-### Frontend Configuration
-- **API Endpoint**: Update API base URL in `script.js`
-- **SignalR Hub**: Configure real-time connection URL
+- Passwords are hashed with ASP.NET Core `PasswordHasher`
+- Anti-forgery tokens on all POST forms
+- EF Core parameterized queries (SQL injection protection)
+- Admin-only areas protected with authorization policies
 
-## 📈 Future Enhancements
+## License
 
-- **Barcode Scanner Integration**: Hardware barcode scanner support
-- **Print Services**: Physical invoice printing
-- **Advanced Analytics**: Sales trends and inventory reports
-- **Multi-location Support**: Multiple store management
-- **User Management**: Role-based access control
-- **Backup & Recovery**: Automated data backup systems
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the repository
-- Contact the development team
-- Check the documentation
-
-## 🎯 Use Cases
-
-### Perfect For:
-- **Retail Stores**: Small to medium-sized retail operations
-- **Grocery Stores**: Food and household item management
-- **Electronics Shops**: Appliance and gadget inventory
-- **Department Stores**: Multi-category retail management
-- **Wholesale Operations**: Bulk purchase and sales tracking
-
-### Industries:
-- **Retail**: General retail operations
-- **Food & Beverage**: Grocery and food service
-- **Electronics**: Consumer electronics and appliances
-- **Household**: Cleaning and personal care products
-- **Stationery**: Office supplies and educational materials
-
----
-
-**Built with ❤️ for the Daily Deals business community**
+MIT — suitable for academic / diploma project submission.

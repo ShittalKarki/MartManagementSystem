@@ -1,9 +1,0 @@
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\MartInventory.Api.csproj.AssemblyReference.cache
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\rpswa.dswa.cache.json
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\MartInventory.Api.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\MartInventory.Api.AssemblyInfoInputs.cache
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\MartInventory.Api.AssemblyInfo.cs
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\MartInventory.Api.csproj.CoreCompileInputs.cache
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\MartInventory.Api.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\MartInventory.Api.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\Dell\Desktop\mart inventory management\Backend\MartInventory.Api\obj\Debug\net9.0\MartInventory.Api.sourcelink.json

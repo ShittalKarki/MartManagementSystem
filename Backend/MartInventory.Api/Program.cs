@@ -2,15 +2,22 @@ using MartInventory.Api.Data;
 using MartInventory.Api.Hubs;
 using MartInventory.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using MySql.EntityFrameworkCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+// Add services to the container
+builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("Default") ?? "Data Source=mart.db"));
+{
+    var connectionString = builder.Configuration.GetConnectionString("Default") ?? "Server=localhost;Database=mart_management_system;Uid=root;Pwd=your_password_here;";
+    options.UseMySQL(connectionString);
+});
 builder.Services.AddScoped<InventoryService>();
 builder.Services.AddSignalR();
-builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAll", policy =>
@@ -19,19 +26,25 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-	app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseCors("AllowAll");
 app.MapControllers();
 app.MapHub<InventoryHub>("/hubs/inventory");
 
-using (var scope = app.Services.CreateScope())
+// Only initialize the database when not running migrations
+if (args.Length == 0 || !args.Contains("--migrate"))
 {
-	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-	await DbInitializer.InitializeAsync(db);
+	using (var scope = app.Services.CreateScope())
+	{
+		var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+		await DbInitializer.InitializeAsync(db);
+	}
 }
 
 app.Run();
