@@ -1,4 +1,5 @@
-// Login Page JavaScript
+/* MartMS */
+// Admin login page — form handling and optional social auth.
 document.addEventListener('DOMContentLoaded', function() {
     initializeLoginPage();
 });
