@@ -4,6 +4,7 @@ namespace MartInventory.Api.Models
 	{
 		public int Id { get; set; }
 		public DateTime OrderedAt { get; set; } = DateTime.UtcNow;
+		public DateTime PurchasedAt { get; set; } = DateTime.UtcNow;
 		public int VendorId { get; set; }
 		public Vendor Vendor { get; set; } = null!;
 		public List<PurchaseOrderLine> Lines { get; set; } = new();
@@ -33,6 +34,7 @@ namespace MartInventory.Api.Models
 		public List<SalesOrderLine> Lines { get; set; } = new();
 		public decimal Subtotal { get; set; }
 		public decimal DiscountAmount { get; set; }
+		public decimal VatAmount { get; set; }
 		public decimal TotalAmount { get; set; }
 		public string Currency { get; set; } = "NPR";
 		public string InvoiceNumber { get; set; } = string.Empty;
@@ -48,6 +50,7 @@ namespace MartInventory.Api.Models
 		public int Quantity { get; set; }
 		public decimal UnitPrice { get; set; }
 		public decimal DiscountPercent { get; set; }
+		public decimal VatPercent { get; set; }
 		public decimal LineTotal { get; set; }
 	}
 
