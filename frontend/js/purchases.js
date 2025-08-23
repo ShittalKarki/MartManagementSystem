@@ -1,3 +1,4 @@
+/* MartMS */
 // Purchases page JavaScript functionality
 
 // Common utility functions
