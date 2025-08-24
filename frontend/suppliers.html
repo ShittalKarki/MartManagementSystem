@@ -11,12 +11,15 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Custom Styles for Responsive Form -->
+    
 </head>
 <body>
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo">
+            <div class="logo"> 
                 <i class="fas fa-store"></i>
                 <h1>Daily Deals</h1>
                 <span class="subtitle">Inventory System</span>
@@ -60,14 +63,14 @@
                 <h2>Suppliers</h2>
             </div>
             <div class="header-actions">
-                <button class="btn btn-primary" onclick="showAddSupplierModal()">
+                <button class="btn btn-info" id="toggleFormBtn">
                     <i class="fas fa-plus"></i> Add Supplier
                 </button>
             </div>
         </header>
 
         <!-- Suppliers List -->
-        <div class="card">
+        <div class="card" id="suppliersListContainer">
             <div class="card-body">
                 <table class="data-table" id="suppliersTable">
                     <thead>
@@ -86,6 +89,97 @@
                 </table>
             </div>
         </div>
+        
+        <!-- Add Supplier Modal Overlay -->
+        <div class="supplier-modal-overlay" id="supplierFormOverlay">
+            <div class="supplier-form-container" id="supplierFormContainer">
+                <h3 class="form-title">Add New Supplier</h3>
+                <button type="button" class="modal-close" id="closeFormBtn">&times;</button>
+                
+                <form id="addSupplierForm">
+                <div class="form-section">
+                    <h4 class="form-section-title">Basic Information</h4>
+                    
+                    <div class="form-group">
+                        <label for="name" class="required">Supplier Name</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                        <div class="error-message" id="nameError">Please enter a supplier name</div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contactPerson">Contact Person</label>
+                            <input type="text" id="contactPerson" name="contactPerson" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone" class="required">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" required>
+                            <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control">
+                        <div class="error-message" id="emailError">Please enter a valid email address</div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h4 class="form-section-title">Address Information</h4>
+                    
+                    <div class="form-group">
+                        <label for="address">Street Address</label>
+                        <textarea id="address" name="address" class="form-control" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="state">State/Province</label>
+                            <input type="text" id="state" name="state" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code</label>
+                            <input type="text" id="postalCode" name="postalCode" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <input type="text" id="country" name="country" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h4 class="form-section-title">Additional Information</h4>
+                    
+                    <div class="form-group">
+                        <label for="products">Products Supplied</label>
+                        <textarea id="products" name="products" class="form-control" rows="2" placeholder="List the products this supplier provides"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelFormBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Supplier</button>
+                </div>
+            </form>
+        </div>
+
     </main>
 
     <!-- Add/Edit Supplier Modal -->
@@ -242,10 +336,84 @@
             <div class="toast-message" id="toast-message"></div>
         </div>
     </div>
+    
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notification-message"></span>
+    </div>
 
     <!-- Scripts -->
     <script src="shared/js/common.js"></script>
     <script src="js/suppliers.js"></script>
+    
+    <!-- Mock API for demo purposes -->
+    <script>
+        // Mock API request function (replace with actual API calls in production)
+        function apiRequest(method, url, data) {
+            return new Promise((resolve, reject) => {
+                // Simulate API delay
+                setTimeout(() => {
+                    // For demo purposes, always succeed
+                    if (method === 'GET' && url === '/api/suppliers') {
+                        // Return mock suppliers data
+                        resolve([
+                            {
+                                id: 1,
+                                name: 'Global Foods Inc.',
+                                contactPerson: 'John Smith',
+                                phone: '(555) 123-4567',
+                                email: 'john@globalfoods.com',
+                                address: '123 Main St',
+                                city: 'New York',
+                                state: 'NY',
+                                postalCode: '10001',
+                                country: 'USA'
+                            },
+                            {
+                                id: 2,
+                                name: 'Fresh Produce Co.',
+                                contactPerson: 'Sarah Johnson',
+                                phone: '(555) 987-6543',
+                                email: 'sarah@freshproduce.com',
+                                address: '456 Market Ave',
+                                city: 'Chicago',
+                                state: 'IL',
+                                postalCode: '60601',
+                                country: 'USA'
+                            },
+                            {
+                                id: 3,
+                                name: 'Tech Gadgets Ltd.',
+                                contactPerson: 'Michael Chen',
+                                phone: '(555) 456-7890',
+                                email: 'michael@techgadgets.com',
+                                address: '789 Tech Blvd',
+                                city: 'San Francisco',
+                                state: 'CA',
+                                postalCode: '94105',
+                                country: 'USA'
+                            }
+                        ]);
+                    } else if (method === 'POST' || method === 'PUT') {
+                        // Simulate successful create/update
+                        resolve({ success: true, data: { ...data, id: data.id || Date.now() } });
+                    } else {
+                        // Simulate successful delete
+                        resolve({ success: true });
+                    }
+                }, 500);
+            });
+        }
+        
+        // Mock showToast function if not defined
+        if (typeof showToast !== 'function') {
+            window.showToast = function(type, message) {
+                console.log(`[${type}] ${message}`);
+                // Use the notification system we created
+                showNotification(type === 'error' ? 'error' : 'success', message);
+            };
+        }
+    </script>
         </div> <!-- Close content-wrapper -->
     </div> <!-- Close container -->
 </body>
