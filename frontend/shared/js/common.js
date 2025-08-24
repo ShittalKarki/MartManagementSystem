@@ -1,3 +1,4 @@
+/* MartMS */
 /**
  * Common JavaScript functions for Daily Deals Inventory Management System
  */
