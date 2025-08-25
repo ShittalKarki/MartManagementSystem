@@ -13,40 +13,46 @@ namespace MartInventory.Api.Controllers
 	[Route("api/[controller]")]
 	public class StockMovementController : ControllerBase
 	{
-		private readonly AppDbContext _db;
+		private readonly ApplicationDbContext _db;
 
-		public StockMovementController(AppDbContext db)
+		public StockMovementController(ApplicationDbContext db)
 		{
 			_db = db;
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<StockMovement>>> GetAll()
+		public async Task<ActionResult<IEnumerable<object>>> GetAll()
 		{
-			return await _db.StockMovements
+			var list = await _db.StockMovements
 				.Include(sm => sm.Product)
 				.OrderByDescending(sm => sm.CreatedAt)
+				.Select(sm => ToDto(sm))
 				.ToListAsync();
+			return Ok(list);
 		}
 
 		[HttpGet("product/{productId}")]
-		public async Task<ActionResult<IEnumerable<StockMovement>>> GetByProduct(int productId)
+		public async Task<ActionResult<IEnumerable<object>>> GetByProduct(int productId)
 		{
-			return await _db.StockMovements
+			var list = await _db.StockMovements
 				.Include(sm => sm.Product)
 				.Where(sm => sm.ProductId == productId)
 				.OrderByDescending(sm => sm.CreatedAt)
+				.Select(sm => ToDto(sm))
 				.ToListAsync();
+			return Ok(list);
 		}
 
 		[HttpGet("recent")]
-		public async Task<ActionResult<IEnumerable<StockMovement>>> GetRecent(int count = 20)
+		public async Task<ActionResult<IEnumerable<object>>> GetRecent(int count = 20)
 		{
-			return await _db.StockMovements
+			var list = await _db.StockMovements
 				.Include(sm => sm.Product)
 				.OrderByDescending(sm => sm.CreatedAt)
 				.Take(count)
+				.Select(sm => ToDto(sm))
 				.ToListAsync();
+			return Ok(list);
 		}
 
 		[HttpPost("adjust")]
@@ -74,8 +80,24 @@ namespace MartInventory.Api.Controllers
 			_db.StockMovements.Add(stockMovement);
 			await _db.SaveChangesAsync();
 
-			return CreatedAtAction(nameof(GetByProduct), new { productId = request.ProductId }, stockMovement);
+			await _db.Entry(stockMovement).Reference(x => x.Product).LoadAsync();
+			return CreatedAtAction(nameof(GetByProduct), new { productId = request.ProductId }, ToDto(stockMovement));
 		}
+
+		private static object ToDto(StockMovement sm) => new
+		{
+			sm.Id,
+			sm.ProductId,
+			Product = sm.Product == null ? null : new { sm.Product.Id, sm.Product.Name, sm.Product.Sku },
+			sm.Quantity,
+			sm.MovementType,
+			sm.PreviousStock,
+			sm.NewStock,
+			sm.Reference,
+			sm.UnitPrice,
+			sm.CreatedAt,
+			sm.Notes
+		};
 	}
 
 	public class StockAdjustmentRequest
