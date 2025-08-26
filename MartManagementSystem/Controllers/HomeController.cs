@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using MartManagementSystem.Models;
 using MartManagementSystem.Services;
 
 namespace MartManagementSystem.Controllers
@@ -16,6 +18,12 @@ namespace MartManagementSystem.Controllers
         {
             var analytics = await _orderService.GetDashboardAnalyticsAsync();
             return View(analytics);
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -1,0 +1,24 @@
+@model MartManagementSystem.Models.ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 2rem;">
+    <div style="font-size: 6rem; margin-bottom: 1rem;">⚠️</div>
+    <h1 class="page-title" style="font-size: 2.5rem; margin-bottom: 0.75rem;">Something went wrong</h1>
+    <p style="color: var(--text-secondary); max-width: 500px; margin-bottom: 2rem; line-height: 1.7;">
+        An unexpected error occurred while processing your request. Please try again or contact support if the problem persists.
+    </p>
+
+    @if (Model?.ShowRequestId == true)
+    {
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 2rem; font-family: monospace; font-size: 0.85rem; color: var(--text-secondary);">
+            Request ID: <span style="color: var(--accent-blue);">@Model.RequestId</span>
+        </div>
+    }
+
+    <a href="@Url.Action("Index", "Home")" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h1v7c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-7h1a1 1 0 0 0 .707-1.707l-9-9a.999.999 0 0 0-1.414 0l-9 9A1 1 0 0 0 3 13z"/></svg>
+        Back to Dashboard
+    </a>
+</div>

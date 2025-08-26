@@ -162,4 +162,4 @@ C:\Users\ACER\OneDrive\Desktop\MartManagementSystem\MartManagementSystem\obj\Deb
 C:\Users\ACER\OneDrive\Desktop\MartManagementSystem\MartManagementSystem\obj\Debug\net9.0\MartManagementSystem.genruntimeconfig.cache
 C:\Users\ACER\OneDrive\Desktop\MartManagementSystem\MartManagementSystem\obj\Debug\net9.0\ref\MartManagementSystem.dll
 C:\Users\ACER\OneDrive\Desktop\MartManagementSystem\MartManagementSystem\obj\Debug\net9.0\swae.build.ex.cache
-C:\Users\ACER\OneDrive\Desktop\MartManagementSystem\MartManagementSystem\obj\Debug\net9.0\compressed\hjofa36nxu-{0}-8jffcxt2ng-8jffcxt2ng.gz
+C:\Users\ACER\OneDrive\Desktop\MartManagementSystem\MartManagementSystem\obj\Debug\net9.0\compressed\hjofa36nxu-{0}-d5yotti79p-d5yotti79p.gz
