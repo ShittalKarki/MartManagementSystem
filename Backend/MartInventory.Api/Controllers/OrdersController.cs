@@ -12,11 +12,11 @@ namespace MartInventory.Api.Controllers
 	[Route("api/[controller]")]
 	public class OrdersController : ControllerBase
 	{
-		private readonly AppDbContext _db;
+		private readonly ApplicationDbContext _db;
 		private readonly InventoryService _inventoryService;
 		private readonly IHubContext<InventoryHub> _hub;
 
-		public OrdersController(AppDbContext db, InventoryService inventoryService, IHubContext<InventoryHub> hub)
+		public OrdersController(ApplicationDbContext db, InventoryService inventoryService, IHubContext<InventoryHub> hub)
 		{
 			_db = db;
 			_inventoryService = inventoryService;
@@ -63,6 +63,64 @@ namespace MartInventory.Api.Controllers
 			var query = _db.InventoryAlerts.Include(a => a.Product).AsQueryable();
 			if (unresolvedOnly) query = query.Where(a => !a.Resolved);
 			return await query.OrderByDescending(a => a.CreatedAt).ToListAsync();
+		}
+
+		[HttpGet("sales")]
+		public async Task<IActionResult> GetSales()
+		{
+			var list = await _db.SalesOrders
+				.Include(p => p.Lines).ThenInclude(l => l.Product)
+				.Include(p => p.Customer)
+				.OrderByDescending(p => p.SoldAt)
+				.Select(p => new
+				{
+					p.Id,
+					p.InvoiceNumber,
+					p.SoldAt,
+					p.TotalAmount,
+					Customer = p.Customer == null ? null : new { p.Customer.Id, p.Customer.Name },
+					Lines = p.Lines.Select(l => new { l.ProductId, ProductName = l.Product.Name, l.Quantity, l.UnitPrice, l.LineTotal })
+				})
+				.ToListAsync();
+			return Ok(list);
+		}
+
+		[HttpGet("purchases")]
+		public async Task<IActionResult> GetPurchases()
+		{
+			var list = await _db.PurchaseOrders
+				.Include(p => p.Lines).ThenInclude(l => l.Product)
+				.Include(p => p.Vendor)
+				.OrderByDescending(p => p.OrderedAt)
+				.Select(p => new
+				{
+					p.Id,
+					p.InvoiceNumber,
+					p.OrderedAt,
+					p.TotalAmount,
+					Vendor = new { p.Vendor.Id, p.Vendor.Name },
+					Lines = p.Lines.Select(l => new { l.ProductId, ProductName = l.Product.Name, l.Quantity, l.UnitPrice, l.LineTotal })
+				})
+				.ToListAsync();
+			return Ok(list);
+		}
+
+		[HttpDelete("sale/{id}")]
+		public async Task<IActionResult> DeleteSale(int id)
+		{
+			var productIds = await _db.SalesOrderLines.Where(l => l.SalesOrderId == id).Select(l => l.ProductId).ToListAsync();
+			await _inventoryService.CancelSaleAsync(id);
+			await BroadcastStockChangesAsync(productIds);
+			return NoContent();
+		}
+
+		[HttpDelete("purchase/{id}")]
+		public async Task<IActionResult> DeletePurchase(int id)
+		{
+			var productIds = await _db.PurchaseOrderLines.Where(l => l.PurchaseOrderId == id).Select(l => l.ProductId).ToListAsync();
+			await _inventoryService.CancelPurchaseAsync(id);
+			await BroadcastStockChangesAsync(productIds);
+			return NoContent();
 		}
 
 		[HttpPost("alerts/{id}/resolve")]

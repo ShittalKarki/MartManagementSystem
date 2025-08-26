@@ -126,9 +126,26 @@ function filterAndDisplayProducts() {
     
     // Filter by category
     if (currentCategory !== 'all') {
-        filteredProducts = products.filter(product => 
-            product.category.toLowerCase().includes(currentCategory)
-        );
+        const categoryMapping = {
+            'grocery': 'Grocery & Food',
+            'fruits': 'Fruits',
+            'meat': 'Meat & Seafood',
+            'bakery': 'Bakery',
+            'packaged': 'Packaged Foods',
+            'personal': 'Personal Care',
+            'household': 'Household',
+            'stationery': 'Stationery',
+            'electronics': 'Electronics',
+            'baby': 'Baby Care',
+            'footwear': 'Footwear'
+        };
+        
+        const targetCategory = categoryMapping[currentCategory];
+        if (targetCategory) {
+            filteredProducts = products.filter(product => 
+                product.category === targetCategory
+            );
+        }
     }
     
     // Apply price filter
@@ -559,7 +576,7 @@ function logout() {
 }
 
 // Filter Functions
-function sortProducts() {
+function onSortChange() {
     filterAndDisplayProducts();
 }
 
@@ -573,120 +590,554 @@ async function fetchProducts() {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Return mock data
+    // Return comprehensive mock data with products organized by category
     return {
         products: [
+            // GROCERY & FOOD
             {
                 id: 1,
+                name: "Premium Basmati Rice",
+                description: "Long grain aromatic basmati rice, perfect for biryani and pulao",
+                category: "Grocery & Food",
+                sellingPrice: 450.00,
+                originalPrice: 520.00,
+                image: "https://via.placeholder.com/300x200?text=Basmati+Rice",
+                popularity: 95
+            },
+            {
+                id: 2,
+                name: "Organic Whole Wheat Flour",
+                description: "Nutritious whole wheat flour for healthy baking",
+                category: "Grocery & Food",
+                sellingPrice: 180.00,
+                image: "https://via.placeholder.com/300x200?text=Wheat+Flour",
+                popularity: 88
+            },
+            {
+                id: 3,
+                name: "Pure Mustard Oil",
+                description: "Traditional mustard oil for authentic cooking",
+                category: "Grocery & Food",
+                sellingPrice: 220.00,
+                originalPrice: 250.00,
+                image: "https://via.placeholder.com/300x200?text=Mustard+Oil",
+                popularity: 82
+            },
+            {
+                id: 4,
+                name: "Organic Green Tea",
+                description: "Antioxidant-rich green tea for healthy lifestyle",
+                category: "Grocery & Food",
+                sellingPrice: 150.00,
+                image: "https://via.placeholder.com/300x200?text=Green+Tea",
+                popularity: 85
+            },
+            {
+                id: 5,
+                name: "Premium Black Pepper",
+                description: "Aromatic black pepper for enhanced flavor",
+                category: "Grocery & Food",
+                sellingPrice: 120.00,
+                image: "https://via.placeholder.com/300x200?text=Black+Pepper",
+                popularity: 78
+            },
+
+            // FRUITS
+            {
+                id: 6,
                 name: "Fresh Organic Apples",
                 description: "Sweet and juicy organic apples, perfect for healthy snacking",
                 category: "Fruits",
                 sellingPrice: 120.00,
                 originalPrice: 150.00,
-                image: "https://via.placeholder.com/300x200?text=Apples",
-                popularity: 95
+                image: "https://via.placeholder.com/300x200?text=Organic+Apples",
+                popularity: 96
             },
             {
-                id: 2,
-                name: "Premium Basmati Rice",
-                description: "Long grain aromatic basmati rice, perfect for biryani and pulao",
-                category: "Grocery & Food",
-                sellingPrice: 450.00,
-                image: "https://via.placeholder.com/300x200?text=Rice",
-                popularity: 88
+                id: 7,
+                name: "Fresh Bananas",
+                description: "Ripe and sweet bananas, great for smoothies and snacking",
+                category: "Fruits",
+                sellingPrice: 80.00,
+                image: "https://via.placeholder.com/300x200?text=Bananas",
+                popularity: 92
             },
             {
-                id: 3,
+                id: 8,
+                name: "Fresh Oranges",
+                description: "Juicy oranges rich in vitamin C",
+                category: "Fruits",
+                sellingPrice: 100.00,
+                originalPrice: 120.00,
+                image: "https://via.placeholder.com/300x200?text=Oranges",
+                popularity: 89
+            },
+            {
+                id: 9,
+                name: "Fresh Mangoes",
+                description: "Sweet and ripe mangoes, perfect for desserts",
+                category: "Fruits",
+                sellingPrice: 180.00,
+                image: "https://via.placeholder.com/300x200?text=Mangoes",
+                popularity: 94
+            },
+            {
+                id: 10,
+                name: "Fresh Strawberries",
+                description: "Sweet and fresh strawberries for desserts and salads",
+                category: "Fruits",
+                sellingPrice: 250.00,
+                originalPrice: 300.00,
+                image: "https://via.placeholder.com/300x200?text=Strawberries",
+                popularity: 87
+            },
+
+            // MEAT & SEAFOOD
+            {
+                id: 11,
                 name: "Fresh Chicken Breast",
                 description: "Boneless chicken breast, perfect for grilling and cooking",
                 category: "Meat & Seafood",
                 sellingPrice: 650.00,
-                image: "https://via.placeholder.com/300x200?text=Chicken",
-                popularity: 92
+                originalPrice: 750.00,
+                image: "https://via.placeholder.com/300x200?text=Chicken+Breast",
+                popularity: 93
             },
             {
-                id: 4,
+                id: 12,
+                name: "Fresh Mutton",
+                description: "Tender mutton for traditional curries",
+                category: "Meat & Seafood",
+                sellingPrice: 850.00,
+                image: "https://via.placeholder.com/300x200?text=Mutton",
+                popularity: 85
+            },
+            {
+                id: 13,
+                name: "Fresh Fish - Rohu",
+                description: "Fresh rohu fish, perfect for Bengali cuisine",
+                category: "Meat & Seafood",
+                sellingPrice: 450.00,
+                originalPrice: 500.00,
+                image: "https://via.placeholder.com/300x200?text=Fresh+Fish",
+                popularity: 88
+            },
+            {
+                id: 14,
+                name: "Fresh Prawns",
+                description: "Large fresh prawns for seafood dishes",
+                category: "Meat & Seafood",
+                sellingPrice: 1200.00,
+                image: "https://via.placeholder.com/300x200?text=Prawns",
+                popularity: 82
+            },
+            {
+                id: 15,
+                name: "Fresh Eggs",
+                description: "Farm fresh eggs, rich in protein",
+                category: "Meat & Seafood",
+                sellingPrice: 120.00,
+                image: "https://via.placeholder.com/300x200?text=Fresh+Eggs",
+                popularity: 90
+            },
+
+            // BAKERY
+            {
+                id: 16,
                 name: "Artisan Sourdough Bread",
                 description: "Freshly baked sourdough bread with crispy crust",
                 category: "Bakery",
                 sellingPrice: 180.00,
-                image: "https://via.placeholder.com/300x200?text=Bread",
-                popularity: 85
+                originalPrice: 220.00,
+                image: "https://via.placeholder.com/300x200?text=Sourdough+Bread",
+                popularity: 86
             },
             {
-                id: 5,
+                id: 17,
+                name: "Chocolate Croissants",
+                description: "Buttery croissants filled with chocolate",
+                category: "Bakery",
+                sellingPrice: 120.00,
+                image: "https://via.placeholder.com/300x200?text=Chocolate+Croissants",
+                popularity: 92
+            },
+            {
+                id: 18,
+                name: "Whole Wheat Bread",
+                description: "Healthy whole wheat bread for sandwiches",
+                category: "Bakery",
+                sellingPrice: 150.00,
+                image: "https://via.placeholder.com/300x200?text=Whole+Wheat+Bread",
+                popularity: 84
+            },
+            {
+                id: 19,
+                name: "Blueberry Muffins",
+                description: "Fresh blueberry muffins with streusel topping",
+                category: "Bakery",
+                sellingPrice: 100.00,
+                originalPrice: 120.00,
+                image: "https://via.placeholder.com/300x200?text=Blueberry+Muffins",
+                popularity: 89
+            },
+            {
+                id: 20,
+                name: "Garlic Bread",
+                description: "Crispy garlic bread with herbs and butter",
+                category: "Bakery",
+                sellingPrice: 80.00,
+                image: "https://via.placeholder.com/300x200?text=Garlic+Bread",
+                popularity: 87
+            },
+
+            // PACKAGED FOODS
+            {
+                id: 21,
                 name: "Organic Honey",
                 description: "Pure organic honey, great for tea and cooking",
                 category: "Packaged Foods",
                 sellingPrice: 350.00,
                 originalPrice: 400.00,
-                image: "https://via.placeholder.com/300x200?text=Honey",
-                popularity: 78
+                image: "https://via.placeholder.com/300x200?text=Organic+Honey",
+                popularity: 88
             },
             {
-                id: 6,
+                id: 22,
+                name: "Premium Olive Oil",
+                description: "Extra virgin olive oil for healthy cooking",
+                category: "Packaged Foods",
+                sellingPrice: 450.00,
+                image: "https://via.placeholder.com/300x200?text=Olive+Oil",
+                popularity: 85
+            },
+            {
+                id: 23,
+                name: "Organic Peanut Butter",
+                description: "Natural peanut butter without preservatives",
+                category: "Packaged Foods",
+                sellingPrice: 280.00,
+                originalPrice: 320.00,
+                image: "https://via.placeholder.com/300x200?text=Peanut+Butter",
+                popularity: 82
+            },
+            {
+                id: 24,
+                name: "Premium Coffee Beans",
+                description: "Arabica coffee beans for rich coffee",
+                category: "Packaged Foods",
+                sellingPrice: 380.00,
+                image: "https://via.placeholder.com/300x200?text=Coffee+Beans",
+                popularity: 86
+            },
+            {
+                id: 25,
+                name: "Dark Chocolate",
+                description: "70% dark chocolate for health benefits",
+                category: "Packaged Foods",
+                sellingPrice: 200.00,
+                originalPrice: 250.00,
+                image: "https://via.placeholder.com/300x200?text=Dark+Chocolate",
+                popularity: 90
+            },
+
+            // PERSONAL CARE
+            {
+                id: 26,
                 name: "Natural Face Cream",
                 description: "Moisturizing face cream with natural ingredients",
                 category: "Personal Care",
                 sellingPrice: 280.00,
-                image: "https://via.placeholder.com/300x200?text=Cream",
+                originalPrice: 350.00,
+                image: "https://via.placeholder.com/300x200?text=Face+Cream",
+                popularity: 84
+            },
+            {
+                id: 27,
+                name: "Organic Shampoo",
+                description: "Sulfate-free shampoo for healthy hair",
+                category: "Personal Care",
+                sellingPrice: 320.00,
+                image: "https://via.placeholder.com/300x200?text=Organic+Shampoo",
+                popularity: 87
+            },
+            {
+                id: 28,
+                name: "Natural Toothpaste",
+                description: "Fluoride-free toothpaste with mint flavor",
+                category: "Personal Care",
+                sellingPrice: 150.00,
+                originalPrice: 180.00,
+                image: "https://via.placeholder.com/300x200?text=Natural+Toothpaste",
                 popularity: 82
             },
             {
-                id: 7,
+                id: 29,
+                name: "Hand Sanitizer",
+                description: "Alcohol-based hand sanitizer for hygiene",
+                category: "Personal Care",
+                sellingPrice: 120.00,
+                image: "https://via.placeholder.com/300x200?text=Hand+Sanitizer",
+                popularity: 89
+            },
+            {
+                id: 30,
+                name: "Body Lotion",
+                description: "Hydrating body lotion with aloe vera",
+                category: "Personal Care",
+                sellingPrice: 200.00,
+                originalPrice: 250.00,
+                image: "https://via.placeholder.com/300x200?text=Body+Lotion",
+                popularity: 85
+            },
+
+            // HOUSEHOLD
+            {
+                id: 31,
                 name: "Eco-Friendly Dish Soap",
                 description: "Biodegradable dish soap, safe for family and environment",
                 category: "Household",
                 sellingPrice: 120.00,
-                image: "https://via.placeholder.com/300x200?text=Soap",
-                popularity: 75
+                originalPrice: 150.00,
+                image: "https://via.placeholder.com/300x200?text=Dish+Soap",
+                popularity: 86
             },
             {
-                id: 8,
+                id: 32,
+                name: "Laundry Detergent",
+                description: "Gentle laundry detergent for all fabrics",
+                category: "Household",
+                sellingPrice: 180.00,
+                image: "https://via.placeholder.com/300x200?text=Laundry+Detergent",
+                popularity: 88
+            },
+            {
+                id: 33,
+                name: "All-Purpose Cleaner",
+                description: "Multi-surface cleaner for home cleaning",
+                category: "Household",
+                sellingPrice: 150.00,
+                originalPrice: 180.00,
+                image: "https://via.placeholder.com/300x200?text=All+Purpose+Cleaner",
+                popularity: 84
+            },
+            {
+                id: 34,
+                name: "Toilet Paper",
+                description: "Soft and absorbent toilet paper",
+                category: "Household",
+                sellingPrice: 200.00,
+                image: "https://via.placeholder.com/300x200?text=Toilet+Paper",
+                popularity: 90
+            },
+            {
+                id: 35,
+                name: "Air Freshener",
+                description: "Natural air freshener with lavender scent",
+                category: "Household",
+                sellingPrice: 100.00,
+                originalPrice: 120.00,
+                image: "https://via.placeholder.com/300x200?text=Air+Freshener",
+                popularity: 82
+            },
+
+            // STATIONERY
+            {
+                id: 36,
                 name: "Premium Writing Pen",
                 description: "Smooth writing pen with ergonomic design",
                 category: "Stationery",
                 sellingPrice: 85.00,
-                image: "https://via.placeholder.com/300x200?text=Pen",
-                popularity: 70
+                originalPrice: 100.00,
+                image: "https://via.placeholder.com/300x200?text=Writing+Pen",
+                popularity: 78
             },
             {
-                id: 9,
+                id: 37,
+                name: "Notebook Set",
+                description: "High-quality notebooks for students and professionals",
+                category: "Stationery",
+                sellingPrice: 120.00,
+                image: "https://via.placeholder.com/300x200?text=Notebook+Set",
+                popularity: 82
+            },
+            {
+                id: 38,
+                name: "Color Pencils",
+                description: "Vibrant color pencils for art and drawing",
+                category: "Stationery",
+                sellingPrice: 150.00,
+                originalPrice: 180.00,
+                image: "https://via.placeholder.com/300x200?text=Color+Pencils",
+                popularity: 85
+            },
+            {
+                id: 39,
+                name: "Stapler",
+                description: "Heavy-duty stapler for office use",
+                category: "Stationery",
+                sellingPrice: 200.00,
+                image: "https://via.placeholder.com/300x200?text=Stapler",
+                popularity: 80
+            },
+            {
+                id: 40,
+                name: "White Paper",
+                description: "Premium white paper for printing and writing",
+                category: "Stationery",
+                sellingPrice: 180.00,
+                originalPrice: 220.00,
+                image: "https://via.placeholder.com/300x200?text=White+Paper",
+                popularity: 83
+            },
+
+            // ELECTRONICS
+            {
+                id: 41,
                 name: "Wireless Bluetooth Earbuds",
                 description: "High-quality wireless earbuds with noise cancellation",
                 category: "Electronics",
                 sellingPrice: 2500.00,
                 originalPrice: 3000.00,
-                image: "https://via.placeholder.com/300x200?text=Earbuds",
-                popularity: 90
+                image: "https://via.placeholder.com/300x200?text=Bluetooth+Earbuds",
+                popularity: 92
             },
             {
-                id: 10,
+                id: 42,
+                name: "USB-C Charging Cable",
+                description: "Fast charging USB-C cable for all devices",
+                category: "Electronics",
+                sellingPrice: 350.00,
+                image: "https://via.placeholder.com/300x200?text=USB+C+Cable",
+                popularity: 88
+            },
+            {
+                id: 43,
+                name: "Wireless Mouse",
+                description: "Ergonomic wireless mouse for comfortable use",
+                category: "Electronics",
+                sellingPrice: 450.00,
+                originalPrice: 550.00,
+                image: "https://via.placeholder.com/300x200?text=Wireless+Mouse",
+                popularity: 85
+            },
+            {
+                id: 44,
+                name: "Phone Stand",
+                description: "Adjustable phone stand for hands-free viewing",
+                category: "Electronics",
+                sellingPrice: 200.00,
+                image: "https://via.placeholder.com/300x200?text=Phone+Stand",
+                popularity: 82
+            },
+            {
+                id: 45,
+                name: "Power Bank",
+                description: "10000mAh power bank for mobile charging",
+                category: "Electronics",
+                sellingPrice: 1200.00,
+                originalPrice: 1500.00,
+                image: "https://via.placeholder.com/300x200?text=Power+Bank",
+                popularity: 89
+            },
+
+            // BABY CARE
+            {
+                id: 46,
                 name: "Baby Diapers Pack",
                 description: "Soft and absorbent diapers for babies",
                 category: "Baby Care",
                 sellingPrice: 450.00,
-                image: "https://via.placeholder.com/300x200?text=Diapers",
+                originalPrice: 520.00,
+                image: "https://via.placeholder.com/300x200?text=Baby+Diapers",
+                popularity: 90
+            },
+            {
+                id: 47,
+                name: "Baby Wipes",
+                description: "Gentle baby wipes for sensitive skin",
+                category: "Baby Care",
+                sellingPrice: 180.00,
+                image: "https://via.placeholder.com/300x200?text=Baby+Wipes",
                 popularity: 87
             },
             {
-                id: 11,
+                id: 48,
+                name: "Baby Formula",
+                description: "Nutritious baby formula for healthy growth",
+                category: "Baby Care",
+                sellingPrice: 850.00,
+                originalPrice: 950.00,
+                image: "https://via.placeholder.com/300x200?text=Baby+Formula",
+                popularity: 85
+            },
+            {
+                id: 49,
+                name: "Baby Shampoo",
+                description: "Tear-free baby shampoo for gentle cleaning",
+                category: "Baby Care",
+                sellingPrice: 220.00,
+                image: "https://via.placeholder.com/300x200?text=Baby+Shampoo",
+                popularity: 84
+            },
+            {
+                id: 50,
+                name: "Baby Food",
+                description: "Organic baby food for healthy development",
+                category: "Baby Care",
+                sellingPrice: 150.00,
+                originalPrice: 180.00,
+                image: "https://via.placeholder.com/300x200?text=Baby+Food",
+                popularity: 86
+            },
+
+            // FOOTWEAR
+            {
+                id: 51,
                 name: "Comfortable Running Shoes",
                 description: "Lightweight running shoes with cushioned sole",
                 category: "Footwear",
                 sellingPrice: 1800.00,
                 originalPrice: 2200.00,
-                image: "https://via.placeholder.com/300x200?text=Shoes",
-                popularity: 83
+                image: "https://via.placeholder.com/300x200?text=Running+Shoes",
+                popularity: 88
             },
             {
-                id: 12,
-                name: "Fresh Tomatoes",
-                description: "Ripe and juicy tomatoes, perfect for salads and cooking",
-                category: "Fruits",
-                sellingPrice: 80.00,
-                image: "https://via.placeholder.com/300x200?text=Tomatoes",
-                popularity: 89
+                id: 52,
+                name: "Casual Sneakers",
+                description: "Stylish casual sneakers for everyday wear",
+                category: "Footwear",
+                sellingPrice: 1200.00,
+                originalPrice: 1500.00,
+                image: "https://via.placeholder.com/300x200?text=Casual+Sneakers",
+                popularity: 85
+            },
+            {
+                id: 53,
+                name: "Formal Shoes",
+                description: "Elegant formal shoes for professional look",
+                category: "Footwear",
+                sellingPrice: 2500.00,
+                image: "https://via.placeholder.com/300x200?text=Formal+Shoes",
+                popularity: 82
+            },
+            {
+                id: 54,
+                name: "Sandals",
+                description: "Comfortable sandals for summer wear",
+                category: "Footwear",
+                sellingPrice: 800.00,
+                originalPrice: 950.00,
+                image: "https://via.placeholder.com/300x200?text=Sandals",
+                popularity: 87
+            },
+            {
+                id: 55,
+                name: "Sports Socks",
+                description: "Moisture-wicking sports socks for comfort",
+                category: "Footwear",
+                sellingPrice: 150.00,
+                image: "https://via.placeholder.com/300x200?text=Sports+Socks",
+                popularity: 84
             }
         ]
     };
