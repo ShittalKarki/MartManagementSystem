@@ -20,10 +20,10 @@ namespace MartInventory.Api.Controllers
 		}
 
 		[HttpGet]
-	public async Task<ActionResult<IEnumerable<Product>>> GetAll()
-	{
-		return await _db.Products.Include(p => p.Category).ToListAsync();
-	}
+		public async Task<ActionResult<IEnumerable<Product>>> GetAll()
+		{
+			return await _db.Products.Include(p => p.Category).Include(p => p.Merchandise).ToListAsync();
+		}
 	
 	[HttpGet("low-stock")]
 	public async Task<ActionResult<IEnumerable<Product>>> GetLowStockProducts()
@@ -35,12 +35,12 @@ namespace MartInventory.Api.Controllers
 	}
 
 		[HttpGet("{id}")]
-	public async Task<ActionResult<Product>> GetById(int id)
-	{
-		var product = await _db.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
-		if (product == null) return NotFound();
-		return product;
-	}
+		public async Task<ActionResult<Product>> GetById(int id)
+		{
+			var product = await _db.Products.Include(p => p.Category).Include(p => p.Merchandise).FirstOrDefaultAsync(p => p.Id == id);
+			if (product == null) return NotFound();
+			return product;
+		}
 
 		[HttpPost]
 		public async Task<ActionResult<Product>> Create(Product product)
@@ -54,7 +54,23 @@ namespace MartInventory.Api.Controllers
 		public async Task<IActionResult> Update(int id, Product product)
 		{
 			if (id != product.Id) return BadRequest();
-			_db.Entry(product).State = EntityState.Modified;
+			
+			var existingProduct = await _db.Products.FindAsync(id);
+			if (existingProduct == null) return NotFound();
+			
+			existingProduct.Name = product.Name;
+			existingProduct.Sku = product.Sku;
+			existingProduct.Description = product.Description;
+			existingProduct.Unit = product.Unit;
+			existingProduct.Barcode = product.Barcode;
+			existingProduct.PurchasePrice = product.PurchasePrice;
+			existingProduct.SellingPrice = product.SellingPrice;
+			existingProduct.VatPercent = product.VatPercent;
+			existingProduct.StockOnHand = product.StockOnHand;
+			existingProduct.ReorderLevel = product.ReorderLevel;
+			existingProduct.CategoryId = product.CategoryId;
+			existingProduct.MerchandiseId = product.MerchandiseId;
+			
 			await _db.SaveChangesAsync();
 			return NoContent();
 		}
@@ -64,9 +80,17 @@ namespace MartInventory.Api.Controllers
 		{
 			var product = await _db.Products.FindAsync(id);
 			if (product == null) return NotFound();
-			_db.Products.Remove(product);
-			await _db.SaveChangesAsync();
-			return NoContent();
+
+			try
+			{
+				_db.Products.Remove(product);
+				await _db.SaveChangesAsync();
+				return NoContent();
+			}
+			catch (DbUpdateException)
+			{
+				return Conflict(new { message = "Cannot delete this product because it is referenced by other records." });
+			}
 		}
 	}
 }
