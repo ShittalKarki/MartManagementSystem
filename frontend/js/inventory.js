@@ -49,7 +49,8 @@ function setupTabs() {
  */
 async function loadStockMovements() {
     try {
-        stockMovements = await apiRequest('inventory/movements');
+        // backend exposes stock movements at api/StockMovement/recent
+        stockMovements = await apiRequest('StockMovement/recent');
         displayStockMovements(stockMovements);
     } catch (error) {
         console.error('Error loading stock movements:', error);
@@ -136,7 +137,8 @@ function formatReference(type, id) {
  */
 async function loadLowStockProducts() {
     try {
-        const lowStockProducts = await apiRequest('inventory/low-stock');
+        // products controller exposes low-stock at api/Products/low-stock
+        const lowStockProducts = await apiRequest('Products/low-stock');
         displayLowStockProducts(lowStockProducts);
     } catch (error) {
         console.error('Error loading low stock products:', error);
@@ -313,8 +315,15 @@ async function handleStockAdjustment(event) {
     };
     
     try {
-        // Create adjustment
-        await apiRequest('inventory/adjustments', 'POST', adjustmentData);
+        // Backend expects POST to api/StockMovement/adjust with { productId, quantity, notes }
+            const payload = {
+                productId: adjustmentData.productId,
+                // send negative quantity for removals
+                quantity: adjustmentData.type === 'remove' ? -Math.abs(adjustmentData.quantity) : Math.abs(adjustmentData.quantity),
+                notes: `${adjustmentData.reason}${adjustmentData.notes ? ' - ' + adjustmentData.notes : ''}`
+            };
+
+            await apiRequest('StockMovement/adjust', 'POST', payload);
         
         // Close modal
         closeStockAdjustmentModal();
