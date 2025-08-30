@@ -1,0 +1,56 @@
+@* MartMS *@
+@model Product
+@{
+    var popularIds = ViewData["PopularIds"] as HashSet<int> ?? new HashSet<int>();
+    var bestSellerIds = ViewData["BestSellerIds"] as HashSet<int> ?? new HashSet<int>();
+    var isPopular = popularIds.Contains(Model.Id);
+    var isBestSeller = bestSellerIds.Contains(Model.Id);
+    var isNew = ShopDisplayHelper.IsNew(Model);
+    var discount = ShopDisplayHelper.GetDiscountPercent(Model);
+    var comparePrice = ShopDisplayHelper.GetCompareAtPrice(Model);
+    var stockClass = ShopDisplayHelper.StockBadgeClass(Model);
+}
+
+<div class="col-sm-6 col-lg-4 col-xl-3">
+    <article class="product-card-modern">
+        <div class="product-card-image-wrap">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="d-block h-100">
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <img src="@Model.ImagePath" alt="@Model.Name" loading="lazy" />
+                }
+                else
+                {
+                    <div class="product-img-placeholder" style="background: linear-gradient(135deg, @ShopDisplayHelper.PlaceholderGradient(Model.Id), @(ShopDisplayHelper.PlaceholderGradient(Model.Id))88);">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                }
+            </a>
+            <div class="product-badges">
+                @if (discount.HasValue) { <span class="product-badge discount">-@discount%</span> }
+                @if (isNew) { <span class="product-badge new">New</span> }
+                @if (isPopular) { <span class="product-badge popular">Popular</span> }
+                @if (isBestSeller) { <span class="product-badge bestseller">Best seller</span> }
+                <span class="product-badge stock-@stockClass">@ShopDisplayHelper.StockBadgeText(Model)</span>
+            </div>
+        </div>
+        <div class="product-card-body">
+            <div class="product-category-label">@Model.Category?.Name</div>
+            <h3 class="product-card-title"><a asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a></h3>
+            <div class="product-price-row">
+                <span class="product-price">Rs. @Model.SellingPrice.ToString("N2")</span>
+                @if (comparePrice.HasValue) { <span class="product-price-old">Rs. @comparePrice.Value.ToString("N0")</span> }
+            </div>
+            <form asp-action="AddToCart" method="post" class="product-card-actions">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <div class="qty-stepper">
+                    <button type="button" class="qty-minus" aria-label="Decrease"><i class="bi bi-dash"></i></button>
+                    <input type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" aria-label="Quantity" />
+                    <button type="button" class="qty-plus" aria-label="Increase"><i class="bi bi-plus"></i></button>
+                </div>
+                <button type="button" class="btn-add-cart btn-add-cart-ajax"><i class="bi bi-cart-plus me-1"></i> Add</button>
+            </form>
+        </div>
+    </article>
+</div>

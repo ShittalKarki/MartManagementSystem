@@ -1,0 +1,56 @@
+@* MartMS *@
+@model IEnumerable<Sale>
+@{
+    ViewData["Title"] = "Sales";
+    ViewData["PageTitle"] = "Sales history";
+    ViewData["PageSubtitle"] = "All invoices from database";
+    ViewData["PageActions"] = $"<a href=\"{Url.Action("Create")}\" class=\"btn btn-primary\"><i class=\"bi bi-cart-plus me-1\"></i>New sale</a>";
+}
+<partial name="_PageHeader" />
+
+<div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small text-muted">Search</label>
+            <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Invoice or customer" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small text-muted">From</label>
+            <input type="date" name="from" value="@ViewBag.From" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small text-muted">To</label>
+            <input type="date" name="to" value="@ViewBag.To" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Apply</button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead><tr><th>Invoice</th><th>Customer</th><th class="text-end">Total</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+            @if (!Model.Any())
+            {
+                <tr><td colspan="5" class="text-center py-5 text-muted">No sales recorded. <a asp-action="Create">Create first sale</a></td></tr>
+            }
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">@s.InvoiceNumber</td>
+                    <td>@(s.Customer?.Name ?? "Walk-in")</td>
+                    <td class="text-end fw-semibold">Rs. @s.TotalAmount.ToString("N2")</td>
+                    <td class="text-muted">@s.SaleDate.ToLocalTime().ToString("g")</td>
+                    <td class="text-end">
+                        <a asp-action="Invoice" asp-route-id="@s.Id" class="btn btn-sm btn-light"><i class="bi bi-printer"></i></a>
+                        <a asp-action="Details" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

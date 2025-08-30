@@ -1,0 +1,63 @@
+@* MartMS *@
+@model Sale
+@{
+    ViewData["Title"] = "Order " + Model.InvoiceNumber;
+    var isRecent = (DateTime.UtcNow - Model.SaleDate).TotalHours < 2;
+}
+
+<div class="mb-4">
+    <a asp-action="Orders" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to orders</a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1">Order @Model.InvoiceNumber</h1>
+            <p class="text-muted mb-2">@Model.SaleDate.ToLocalTime().ToString("f")</p>
+            <span class="order-status @(isRecent ? "processing" : "completed")">@(isRecent ? "Processing" : "Completed")</span>
+        </div>
+        <div class="text-end">
+            <div class="fs-4 fw-bold text-primary">Rs. @Model.TotalAmount.ToString("N2")</div>
+            <a asp-action="Invoice" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm mt-2" target="_blank">
+                <i class="bi bi-download me-1"></i>Download invoice
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light"><tr><th>Product</th><th>Qty</th><th>Price</th><th class="text-end">Total</th></tr></thead>
+            <tbody>
+            @foreach (var line in Model.Items)
+            {
+                <tr>
+                    <td>
+                        <div class="fw-semibold">@line.Product.Name</div>
+                        <small class="text-muted">@line.Product.Sku</small>
+                    </td>
+                    <td>@line.Quantity @line.Product.Unit</td>
+                    <td>Rs. @line.UnitPrice.ToString("N2")</td>
+                    <td class="text-end fw-semibold">Rs. @line.LineTotal.ToString("N2")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row justify-content-end">
+        <div class="col-md-5">
+            <div class="d-flex justify-content-between small mb-1"><span>Subtotal</span><span>Rs. @Model.Subtotal.ToString("N2")</span></div>
+            <div class="d-flex justify-content-between small mb-1"><span>Tax</span><span>Rs. @Model.TaxAmount.ToString("N2")</span></div>
+            @if (Model.DiscountAmount > 0)
+            {
+                <div class="d-flex justify-content-between small mb-1 text-success"><span>Discount</span><span>- Rs. @Model.DiscountAmount.ToString("N2")</span></div>
+            }
+            <hr />
+            <div class="d-flex justify-content-between fw-bold"><span>Grand total</span><span>Rs. @Model.TotalAmount.ToString("N2")</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    <a asp-action="Index" asp-route-catalog="true" class="btn btn-shop-primary"><i class="bi bi-basket me-1"></i>Continue shopping</a>
+</div>

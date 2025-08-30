@@ -1,0 +1,24 @@
+// MartMS
+global using System.ComponentModel.DataAnnotations;
+global using System.Net;
+global using System.Security.Claims;
+global using System.Security.Cryptography;
+global using System.Text;
+global using System.Text.Json;
+global using ClosedXML.Excel;
+global using MartManagement.Web.Data;
+global using MartManagement.Web.Middleware;
+global using MartManagement.Web.Helpers;
+global using MartManagement.Web.Models;
+global using MartManagement.Web.Services;
+global using MartManagement.Web.ViewModels;
+global using Microsoft.AspNetCore.Authentication;
+global using Microsoft.AspNetCore.Authentication.Cookies;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Rendering;
+global using Microsoft.AspNetCore.Mvc.ViewComponents;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.EntityFrameworkCore.Migrations;

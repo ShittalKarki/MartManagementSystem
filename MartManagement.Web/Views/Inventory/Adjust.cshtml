@@ -1,0 +1,31 @@
+@* MartMS *@
+@model StockAdjustViewModel
+@{ ViewData["Title"] = "Adjust Stock"; }
+<div class="page-header"><h2>Stock Adjustment</h2></div>
+<div class="card p-4" style="max-width: 520px;">
+    <form asp-action="Adjust" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="ProductId" class="form-label"></label>
+            <select asp-for="ProductId" asp-items="Model.Products" class="form-select"></select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="AdjustmentType" class="form-label"></label>
+            <select asp-for="AdjustmentType" class="form-select">
+                <option value="In">Stock In</option>
+                <option value="Out">Stock Out</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Quantity" class="form-label"></label>
+            <input asp-for="Quantity" class="form-control" type="number" min="1" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Notes" class="form-label"></label>
+            <input asp-for="Notes" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Update Stock</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>

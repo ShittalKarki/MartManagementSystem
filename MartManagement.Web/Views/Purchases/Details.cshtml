@@ -1,0 +1,17 @@
+@* MartMS *@
+@model Purchase
+@{ ViewData["Title"] = Model.InvoiceNumber; }
+<div class="page-header"><h2>@Model.InvoiceNumber</h2></div>
+<div class="card p-4">
+    <p><strong>Supplier:</strong> @Model.Supplier.Name · <strong>Date:</strong> @Model.PurchaseDate.ToLocalTime().ToString("f")</p>
+    <table class="table">
+        <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+        <tbody>
+        @foreach (var line in Model.Items)
+        {
+            <tr><td>@line.Product.Name</td><td>@line.Quantity</td><td>Rs. @line.UnitPrice.ToString("N2")</td><td>Rs. @line.LineTotal.ToString("N2")</td></tr>
+        }
+        </tbody>
+    </table>
+    <p class="text-end fw-bold">Total: Rs. @Model.TotalAmount.ToString("N2")</p>
+</div>

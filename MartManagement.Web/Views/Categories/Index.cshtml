@@ -1,0 +1,51 @@
+@* MartMS *@
+@model IEnumerable<Category>
+@{
+    ViewData["Title"] = "Categories";
+    ViewData["PageTitle"] = "Categories";
+    ViewData["PageActions"] = $"<a href=\"{Url.Action("Create")}\" class=\"btn btn-primary\"><i class=\"bi bi-plus-lg me-1\"></i>Add category</a>";
+}
+<partial name="_PageHeader" />
+
+<div class="filter-bar">
+    <form method="get" class="row g-2">
+        <div class="col-md-5">
+            <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search categories..." />
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead><tr><th>Name</th><th>Description</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+            @if (!Model.Any())
+            {
+                <tr><td colspan="4" class="text-center py-5 text-muted">No categories. <a asp-action="Create">Add one</a></td></tr>
+            }
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">@c.Name</td>
+                    <td class="text-muted">@c.Description</td>
+                    <td><span class="badge rounded-pill bg-@(c.IsActive ? "success" : "secondary")-subtle text-@(c.IsActive ? "success" : "secondary")">@(c.IsActive ? "Active" : "Inactive")</span></td>
+                    <td class="text-end">
+                        <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" data-confirm-delete data-confirm-message="Delete category '@c.Name'?">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

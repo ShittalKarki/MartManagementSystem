@@ -1,0 +1,64 @@
+@* MartMS *@
+@model PurchaseCreateViewModel
+@{ ViewData["Title"] = "New Purchase"; }
+<div class="page-header"><h2>Record Purchase</h2></div>
+<div class="card p-4">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label asp-for="SupplierId" class="form-label"></label>
+                <select asp-for="SupplierId" asp-items="Model.Suppliers" class="form-select"></select>
+            </div>
+            <div class="col-md-8">
+                <label asp-for="Notes" class="form-label"></label>
+                <input asp-for="Notes" class="form-control" />
+            </div>
+        </div>
+        <div id="lineItems">
+            @for (var i = 0; i < Model.Lines.Count; i++)
+            {
+                <div class="row g-2 line-row mb-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label">Product</label>
+                        <select asp-for="Lines[i].ProductId" asp-items="Model.Products" class="form-select product-select"></select>
+                    </div>
+                    <div class="col-md-2"><label class="form-label">Qty</label><input asp-for="Lines[i].Quantity" class="form-control" type="number" min="1" /></div>
+                    <div class="col-md-2"><label class="form-label">Unit Price</label><input asp-for="Lines[i].UnitPrice" class="form-control price-input" /></div>
+                    <div class="col-md-2"><label class="form-label">Tax %</label><input asp-for="Lines[i].TaxPercent" class="form-control tax-input" /></div>
+                    <div class="col-md-1"><button type="button" class="btn btn-outline-danger w-100" onclick="mart.removeLine(this)">×</button></div>
+                </div>
+            }
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="addLine">+ Add line</button>
+        <div>
+            <button type="submit" class="btn btn-primary">Save Purchase</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+@section Scripts {
+<script>
+    const productOptions = `@Html.Raw(string.Join("", Model.Products.Select(p => $"<option value='{p.Value}'>{p.Text}</option>")))`;
+    document.getElementById('addLine').addEventListener('click', () => {
+        const i = document.querySelectorAll('#lineItems .line-row').length;
+        document.getElementById('lineItems').insertAdjacentHTML('beforeend', `
+            <div class="row g-2 line-row mb-2 align-items-end">
+                <div class="col-md-5"><select name="Lines[${i}].ProductId" class="form-select product-select">${productOptions}</select></div>
+                <div class="col-md-2"><input name="Lines[${i}].Quantity" class="form-control" type="number" min="1" value="1" /></div>
+                <div class="col-md-2"><input name="Lines[${i}].UnitPrice" class="form-control price-input" /></div>
+                <div class="col-md-2"><input name="Lines[${i}].TaxPercent" class="form-control tax-input" value="13" /></div>
+                <div class="col-md-1"><button type="button" class="btn btn-outline-danger w-100" onclick="mart.removeLine(this)">×</button></div>
+            </div>`);
+    });
+    document.querySelectorAll('.product-select').forEach(sel => {
+        sel.addEventListener('change', async function () {
+            const res = await fetch(`/Purchases/ProductInfo/${this.value}`);
+            const data = await res.json();
+            this.closest('.line-row').querySelector('.price-input').value = data.purchasePrice;
+            this.closest('.line-row').querySelector('.tax-input').value = data.taxPercent;
+        });
+    });
+</script>
+}

@@ -1,0 +1,153 @@
+@* MartMS *@
+@{
+    var title = ViewData["Title"] as string ?? "Shop";
+    var userName = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? "Customer";
+    var cartCount = ViewBag.CartCount as int? ?? 0;
+    var cartSummary = ViewBag.CartSummary as CartSummaryViewModel;
+    var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="request-verification-token" content="@token" />
+    <title>@title - MartMS Shop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+</head>
+<body class="customer-portal">
+    <nav class="navbar navbar-expand-lg shop-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="Shop" asp-action="Index">
+                <i class="bi bi-basket2-fill me-1"></i> MartMS
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#customerNav" aria-label="Menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="customerNav">
+                <ul class="navbar-nav me-lg-3">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Shop" asp-action="Index">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Shop" asp-action="Index" asp-route-catalog="true">All products</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Shop" asp-action="Orders">My orders</a></li>
+                </ul>
+                <form method="get" asp-controller="Shop" asp-action="Index" asp-route-catalog="true" class="shop-search-wrap mx-lg-auto my-3 my-lg-0">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="search" name="search" id="shopSearchInput" class="form-control" placeholder="Search products..." value="@ViewBag.Search" autocomplete="off" />
+                    <div id="searchSuggestions" class="search-suggestions"></div>
+                </form>
+                <div class="d-flex align-items-center gap-2 ms-lg-auto">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill d-none d-md-inline-flex" id="themeToggleShop" title="Toggle theme">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                    <a href="#" class="btn btn-shop-cart btn-outline-primary btn-sm" id="openCartDrawer">
+                        <i class="bi bi-bag"></i>
+                        <span class="d-none d-sm-inline ms-1">Cart</span>
+                        <span id="cartBadge" class="badge bg-danger rounded-pill ms-1" style="@(cartCount > 0 ? "" : "display:none")">@cartCount</span>
+                    </a>
+                    <a class="btn btn-light btn-sm rounded-pill d-none d-md-inline-flex" asp-controller="Account" asp-action="Profile">
+                        <i class="bi bi-person me-1"></i>@userName.Split(' ').FirstOrDefault()
+                    </a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        @await Html.PartialAsync("_Alerts")
+        @RenderBody()
+    </main>
+
+    <footer class="border-top py-4 mt-5 bg-white">
+        <div class="container text-center text-muted small">
+            <p class="mb-0">&copy; @DateTime.Now.Year MartMS — Customer Shop</p>
+        </div>
+    </footer>
+
+    <!-- Cart drawer -->
+    <div class="cart-drawer-overlay" id="cartDrawerOverlay"></div>
+    <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+        <div class="cart-drawer-header">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-bag-check me-2"></i>Your cart</h5>
+            <button type="button" class="btn btn-sm btn-light rounded-circle" id="closeCartDrawer" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="cart-drawer-body" id="cartDrawerBody">
+            @if (cartSummary?.Items.Any() == true)
+            {
+                foreach (var item in cartSummary.Items)
+                {
+                    <div class="cart-item-row">
+                        <div class="cart-item-thumb">
+                            @if (!string.IsNullOrEmpty(item.ImagePath))
+                            {
+                                <img src="@item.ImagePath" alt="" />
+                            }
+                            else
+                            {
+                                <div class="product-img-placeholder" style="background:@ShopDisplayHelper.PlaceholderGradient(item.ProductId);font-size:1rem;height:100%"><i class="bi bi-box-seam"></i></div>
+                            }
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold small">@item.Name</div>
+                            <div class="text-muted small">Rs. @item.UnitPrice.ToString("N2")</div>
+                        </div>
+                        <div class="fw-bold small">Rs. @item.LineTotal.ToString("N2")</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="cart-empty">
+                    <i class="bi bi-cart-x"></i>
+                    <p class="mb-0 fw-semibold">Cart is empty</p>
+                </div>
+            }
+        </div>
+        <div class="cart-drawer-footer">
+            <div class="d-flex justify-content-between mb-1 small text-muted">
+                <span>Subtotal</span>
+                <span id="cartDrawerSubtotal">Rs. @(cartSummary?.Subtotal.ToString("N2") ?? "0.00")</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3 fw-bold">
+                <span>Total (incl. tax)</span>
+                <span id="cartDrawerTotal" class="text-primary">Rs. @(cartSummary?.Total.ToString("N2") ?? "0.00")</span>
+            </div>
+            <button type="button" class="btn btn-shop-primary w-100 mb-2" id="cartDrawerCheckout">
+                <i class="bi bi-bag-check me-1"></i> Place order
+            </button>
+            <a asp-action="Cart" class="btn btn-outline-secondary w-100 btn-sm">View full cart</a>
+        </div>
+    </aside>
+
+    @await Html.PartialAsync("_ToastContainer")
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/shop.js" asp-append-version="true"></script>
+    <script>
+        document.getElementById('themeToggleShop')?.addEventListener('click', () => {
+            const html = document.documentElement;
+            const next = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', next);
+            localStorage.setItem('theme', next);
+            document.querySelector('#themeToggleShop i').className = next === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+        });
+        (function () {
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-bs-theme', saved);
+                const icon = document.querySelector('#themeToggleShop i');
+                if (icon) icon.className = saved === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+            }
+        })();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

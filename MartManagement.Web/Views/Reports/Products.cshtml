@@ -1,0 +1,27 @@
+@* MartMS *@
+@model IReadOnlyList<ProductReportRowViewModel>
+@{ ViewData["Title"] = "Product Report"; }
+<div class="page-header">
+    <h2>Product / Inventory Report</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">Sales Report</a>
+</div>
+<div class="card table-card">
+    <table class="table table-hover">
+        <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Stock</th><th>Reorder</th><th>Buy</th><th>Sell</th><th>Stock Value</th></tr></thead>
+        <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Sku</td>
+                <td>@r.Name</td>
+                <td>@r.Category</td>
+                <td class="@(r.Stock <= r.ReorderLevel ? "low-stock" : "")">@r.Stock</td>
+                <td>@r.ReorderLevel</td>
+                <td>Rs. @r.PurchasePrice.ToString("N2")</td>
+                <td>Rs. @r.SellingPrice.ToString("N2")</td>
+                <td>Rs. @r.StockValue.ToString("N2")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

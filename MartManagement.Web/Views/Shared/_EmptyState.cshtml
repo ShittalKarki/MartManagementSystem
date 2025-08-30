@@ -1,0 +1,18 @@
+@* MartMS *@
+@{
+    var icon = ViewData["EmptyIcon"] as string ?? "bi-inbox";
+    var message = ViewData["EmptyMessage"] as string ?? "No records found";
+    var hint = ViewData["EmptyHint"] as string;
+}
+<div class="empty-state">
+    <div class="empty-state-icon"><i class="bi @icon"></i></div>
+    <h5>@message</h5>
+    @if (!string.IsNullOrEmpty(hint))
+    {
+        <p class="text-muted">@hint</p>
+    }
+    @if (IsSectionDefined("EmptyAction"))
+    {
+        <div class="mt-3">@await RenderSectionAsync("EmptyAction", required: false)</div>
+    }
+</div>

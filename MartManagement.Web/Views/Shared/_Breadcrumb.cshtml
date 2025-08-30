@@ -1,0 +1,28 @@
+@* MartMS *@
+@{
+    var parent = ViewData["BreadcrumbParent"] as string;
+    var parentUrl = ViewData["BreadcrumbParentUrl"] as string;
+    var title = ViewData["PageTitle"] as string ?? ViewData["Title"] as string;
+}
+@if (!string.IsNullOrEmpty(title))
+{
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Index">Home</a></li>
+            @if (!string.IsNullOrEmpty(parent))
+            {
+                <li class="breadcrumb-item">
+                    @if (!string.IsNullOrEmpty(parentUrl))
+                    {
+                        <a href="@parentUrl">@parent</a>
+                    }
+                    else
+                    {
+                        @parent
+                    }
+                </li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@title</li>
+        </ol>
+    </nav>
+}

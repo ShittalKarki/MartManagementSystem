@@ -1,0 +1,78 @@
+@* MartMS *@
+@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Inventory";
+    ViewData["PageTitle"] = "Inventory";
+    ViewData["PageSubtitle"] = "Current stock levels and movement history";
+    var lowStock = ViewBag.LowStock as IReadOnlyList<Product>;
+    var movements = ViewBag.Movements as IReadOnlyList<StockMovement>;
+    ViewData["PageActions"] = $"<a href=\"{Url.Action("Adjust")}\" class=\"btn btn-primary\"><i class=\"bi bi-arrow-left-right me-1\"></i>Stock adjustment</a>";
+}
+<partial name="_PageHeader" />
+
+@if (lowStock?.Any() == true)
+{
+    <div class="alert alert-warning d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span><strong>@lowStock.Count</strong> product(s) at or below reorder level.</span>
+        <a asp-action="Adjust" class="ms-auto btn btn-sm btn-warning">Restock</a>
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header chart-card">Stock levels</div>
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead><tr><th>Product</th><th>Category</th><th>On hand</th><th>Reorder</th><th>Status</th></tr></thead>
+            <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">@p.Name</td>
+                    <td>@p.Category?.Name</td>
+                    <td class="@(p.StockQuantity <= p.ReorderLevel ? "low-stock" : "")">@p.StockQuantity</td>
+                    <td>@p.ReorderLevel</td>
+                    <td>
+                        @if (p.StockQuantity <= p.ReorderLevel)
+                        {
+                            <span class="badge text-bg-danger-subtle text-danger">Low</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-success-subtle text-success">OK</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header chart-card">Recent movements</div>
+    <div class="table-responsive">
+        <table class="table table-modern table-sm mb-0">
+            <thead><tr><th>When</th><th>Product</th><th>Change</th><th>Type</th><th>Reference</th></tr></thead>
+            <tbody>
+            @if (movements == null || !movements.Any())
+            {
+                <tr><td colspan="5" class="text-center text-muted py-3">No stock movements yet.</td></tr>
+            }
+            else
+            {
+                @foreach (var m in movements)
+                {
+                    <tr>
+                        <td class="text-muted">@m.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>@m.Product?.Name</td>
+                        <td class="@(m.QuantityChange < 0 ? "text-danger" : "text-success") fw-semibold">@(m.QuantityChange > 0 ? "+" : "")@m.QuantityChange</td>
+                        <td>@m.MovementType</td>
+                        <td><code class="small">@m.Reference</code></td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

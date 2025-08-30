@@ -1,0 +1,18 @@
+@* MartMS *@
+@model UserFormViewModel
+@{ ViewData["Title"] = Model.Id == 0 ? "Add User" : "Edit User"; }
+<div class="page-header"><h2>@ViewData["Title"]</h2></div>
+<div class="card p-4" style="max-width: 560px;">
+    <form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <div class="mb-3"><label asp-for="Username" class="form-label"></label><input asp-for="Username" class="form-control" /></div>
+        <div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" /></div>
+        <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /></div>
+        <div class="mb-3"><label class="form-label">Role</label><select asp-for="RoleId" asp-items="ViewBag.Roles" class="form-select"></select></div>
+        <div class="mb-3"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" /></div>
+        @if (Model.Id > 0) { <div class="form-check mb-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label"></label></div> }
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>

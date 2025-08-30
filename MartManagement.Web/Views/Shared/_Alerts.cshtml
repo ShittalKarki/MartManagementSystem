@@ -1,0 +1,17 @@
+@* MartMS *@
+@if (TempData["Success"] != null)
+{
+    <div class="d-none" data-temp-success="@TempData["Success"]"></div>
+    <div class="alert alert-success alert-dismissible fade show toast-alert" role="alert">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="d-none" data-temp-error="@TempData["Error"]"></div>
+    <div class="alert alert-danger alert-dismissible fade show toast-alert" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}

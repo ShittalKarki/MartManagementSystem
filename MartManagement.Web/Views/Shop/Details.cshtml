@@ -1,0 +1,96 @@
+@* MartMS *@
+@model ProductDetailsViewModel
+@{
+    ViewData["Title"] = Model.Product.Name;
+    var p = Model.Product;
+    ViewData["PopularIds"] = Model.IsPopular ? new HashSet<int> { p.Id } : new HashSet<int>();
+    ViewData["BestSellerIds"] = Model.IsBestSeller ? new HashSet<int> { p.Id } : new HashSet<int>();
+    var comparePrice = ShopDisplayHelper.GetCompareAtPrice(p);
+    var discount = ShopDisplayHelper.GetDiscountPercent(p);
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a asp-action="Index">Shop</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index" asp-route-catalog="true" asp-route-categoryId="@p.CategoryId">@p.Category?.Name</a></li>
+        <li class="breadcrumb-item active">@p.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4 mb-5">
+    <div class="col-lg-6">
+        <div class="product-detail-gallery">
+            @if (!string.IsNullOrEmpty(p.ImagePath))
+            {
+                <img src="@p.ImagePath" alt="@p.Name" />
+            }
+            else
+            {
+                <div class="product-img-placeholder h-100" style="background: linear-gradient(135deg, @ShopDisplayHelper.PlaceholderGradient(p.Id), @(ShopDisplayHelper.PlaceholderGradient(p.Id))66); min-height:320px;">
+                    <i class="bi bi-box-seam" style="font-size:4rem"></i>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="product-detail-info h-100">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="product-badge stock-@ShopDisplayHelper.StockBadgeClass(p)">@ShopDisplayHelper.StockBadgeText(p)</span>
+                @if (ShopDisplayHelper.IsNew(p)) { <span class="product-badge new">New</span> }
+                @if (Model.IsPopular) { <span class="product-badge popular">Popular</span> }
+                @if (Model.IsBestSeller) { <span class="product-badge bestseller">Best seller</span> }
+                @if (discount.HasValue) { <span class="product-badge discount">@discount% OFF</span> }
+            </div>
+            <p class="product-category-label mb-1">@p.Category?.Name</p>
+            <h1 class="h3 fw-bold mb-2">@p.Name</h1>
+            <p class="text-muted small mb-3">SKU: @p.Sku · Unit: @p.Unit</p>
+
+            <div class="product-price-row mb-4">
+                <span class="product-price fs-3">Rs. @p.SellingPrice.ToString("N2")</span>
+                @if (comparePrice.HasValue)
+                {
+                    <span class="product-price-old fs-5">Rs. @comparePrice.Value.ToString("N0")</span>
+                }
+            </div>
+
+            <p class="text-muted mb-4">@(string.IsNullOrWhiteSpace(p.Description) ? "Quality product from our mart catalog. Fresh stock available for online order and pickup." : p.Description)</p>
+
+            <ul class="list-unstyled small mb-4">
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>@p.StockQuantity @p.Unit available</li>
+                <li class="mb-2"><i class="bi bi-truck text-primary me-2"></i>Ready for store pickup</li>
+                <li><i class="bi bi-shield-check text-primary me-2"></i>Tax @p.TaxPercent% included at checkout</li>
+            </ul>
+
+            <form asp-action="AddToCart" method="post" class="d-flex flex-wrap align-items-center gap-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productId" value="@p.Id" />
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                <div class="qty-stepper" style="min-width:120px">
+                    <button type="button" class="qty-minus"><i class="bi bi-dash"></i></button>
+                    <input type="number" name="quantity" value="1" min="1" max="@p.StockQuantity" />
+                    <button type="button" class="qty-plus"><i class="bi bi-plus"></i></button>
+                </div>
+                <button type="button" class="btn btn-shop-primary btn-lg btn-add-cart-ajax px-4">
+                    <i class="bi bi-cart-plus me-2"></i>Add to cart
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (Model.RelatedProducts.Any())
+{
+    <section class="shop-section">
+        <h2 class="h5 fw-bold mb-3">Related products</h2>
+        <div class="row g-3">
+            @{
+                ViewData["PopularIds"] = Model.IsPopular ? new HashSet<int> { Model.Product.Id } : new HashSet<int>();
+                ViewData["BestSellerIds"] = Model.IsBestSeller ? new HashSet<int> { Model.Product.Id } : new HashSet<int>();
+            }
+            @foreach (var rp in Model.RelatedProducts)
+            {
+                <partial name="_ProductCard" model="rp" />
+            }
+        </div>
+    </section>
+}

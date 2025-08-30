@@ -1,0 +1,166 @@
+@* MartMS *@
+@model ShopHomeViewModel
+@{
+    ViewData["Title"] = Model.ShowCatalogOnly ? "All Products" : "Shop";
+    ViewData["PopularIds"] = Model.PopularIds;
+    ViewData["BestSellerIds"] = Model.BestSellerIds;
+    ViewBag.Search = Model.Filter.Search;
+}
+
+@if (!Model.ShowCatalogOnly)
+{
+    <section class="shop-hero">
+        <span class="shop-hero-badge"><i class="bi bi-lightning-charge"></i> Fresh deals every week</span>
+        <h1>Your neighborhood mart, online</h1>
+        <p class="lead mb-4">Browse groceries, beverages, and daily essentials. Order in seconds — we deliver from our store inventory.</p>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-action="Index" asp-route-catalog="true" class="btn btn-light btn-lg fw-semibold px-4">Shop now</a>
+            <a asp-action="Orders" class="btn btn-outline-light btn-lg">My orders</a>
+        </div>
+    </section>
+
+    @if (Model.PopularCategories.Any())
+    {
+        <section class="shop-section">
+            <div class="shop-section-header">
+                <h2><i class="bi bi-grid me-2 text-primary"></i>Popular categories</h2>
+            </div>
+            <div class="category-scroll">
+                @foreach (var cat in Model.PopularCategories)
+                {
+                    <a asp-action="Index" asp-route-catalog="true" asp-route-categoryId="@cat.Id" class="category-pill">
+                        <span class="category-pill-icon"><i class="bi bi-tag"></i></span>
+                        <span class="fw-semibold small">@cat.Name</span>
+                        <span class="text-muted small">@cat.ProductCount items</span>
+                    </a>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.FeaturedProducts.Any())
+    {
+        <section class="shop-section">
+            <div class="shop-section-header">
+                <h2><i class="bi bi-stars me-2 text-warning"></i>Featured products</h2>
+                <a asp-action="Index" asp-route-catalog="true" class="btn btn-sm btn-outline-primary rounded-pill">View all</a>
+            </div>
+            <div class="row g-3">
+                @foreach (var p in Model.FeaturedProducts)
+                {
+                    <partial name="_ProductCard" model="p" />
+                }
+            </div>
+        </section>
+    }
+
+    <section class="shop-promo">
+        <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-gift me-2"></i>Weekend special</h5>
+            <p class="mb-0 small text-muted">Free delivery on orders above Rs. 500 — perfect for your college demo!</p>
+        </div>
+        <a asp-action="Index" asp-route-catalog="true" class="btn btn-shop-primary">Browse offers</a>
+    </section>
+
+    @if (Model.BestSellers.Any())
+    {
+        <section class="shop-section">
+            <div class="shop-section-header">
+                <h2><i class="bi bi-fire me-2 text-danger"></i>Best sellers</h2>
+            </div>
+            <div class="row g-3">
+                @foreach (var p in Model.BestSellers)
+                {
+                    <partial name="_ProductCard" model="p" />
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.Products.Any())
+    {
+        <section class="shop-section">
+            <div class="shop-section-header">
+                <h2><i class="bi bi-clock me-2"></i>New arrivals</h2>
+                <a asp-action="Index" asp-route-catalog="true" asp-route-sort="newest" class="btn btn-sm btn-link">See more</a>
+            </div>
+            <div class="row g-3">
+                @foreach (var p in Model.Products)
+                {
+                    <partial name="_ProductCard" model="p" />
+                }
+            </div>
+        </section>
+    }
+}
+else
+{
+    <div class="shop-section-header mb-3">
+        <div>
+            <h1 class="h3 fw-bold mb-1">All products</h1>
+            <p class="text-muted mb-0">@Model.Products.Count item(s) found</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-house me-1"></i>Back to home</a>
+    </div>
+
+    <div class="shop-filter-bar">
+        <form method="get" asp-action="Index" class="row g-3 align-items-end">
+            <input type="hidden" name="catalog" value="true" />
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold">Search</label>
+                <input name="search" value="@Model.Filter.Search" class="form-control" placeholder="Product name or SKU" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Category</label>
+                <select name="categoryId" class="form-select">
+                    <option value="" selected="@(!Model.Filter.CategoryId.HasValue)">All</option>
+                    @foreach (var c in Model.Categories)
+                    {
+                        <option value="@c.Id" selected="@(Model.Filter.CategoryId == c.Id)">@c.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Min price</label>
+                <input type="number" name="minPrice" value="@Model.Filter.MinPrice" class="form-control" min="0" step="1" placeholder="0" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Max price</label>
+                <input type="number" name="maxPrice" value="@Model.Filter.MaxPrice" class="form-control" min="0" step="1" placeholder="@Model.PriceRangeMax?.ToString("N0")" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Sort by</label>
+                <select name="sort" class="form-select">
+                    <option value="name" selected="@(Model.Filter.Sort == "name")">Name</option>
+                    <option value="price_asc" selected="@(Model.Filter.Sort == "price_asc")">Price: Low to High</option>
+                    <option value="price_desc" selected="@(Model.Filter.Sort == "price_desc")">Price: High to Low</option>
+                    <option value="newest" selected="@(Model.Filter.Sort == "newest")">Newest</option>
+                    <option value="popular" selected="@(Model.Filter.Sort == "popular")">Popularity</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-shop-primary"><i class="bi bi-funnel me-1"></i>Apply filters</button>
+                <a asp-action="Index" asp-route-catalog="true" class="btn btn-outline-secondary ms-1">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    @if (!Model.Products.Any())
+    {
+        <div class="shop-empty-state">
+            <i class="bi bi-search"></i>
+            <h5>No products found</h5>
+            <p class="text-muted">Try adjusting your search or filters.</p>
+            <a asp-action="Index" asp-route-catalog="true" class="btn btn-shop-primary mt-2">Clear filters</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var p in Model.Products)
+            {
+                <partial name="_ProductCard" model="p" />
+            }
+        </div>
+    }
+}

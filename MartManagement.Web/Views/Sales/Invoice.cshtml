@@ -1,0 +1,44 @@
+@* MartMS *@
+@model Sale
+@{ ViewData["Title"] = "Invoice " + Model.InvoiceNumber; Layout = "~/Views/Shared/_Layout.cshtml"; }
+<div class="no-print mb-3 text-end">
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> Print</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+</div>
+<div class="card invoice-print p-4">
+    <div class="text-center mb-4">
+        <h3 class="mb-0">Mart Management System</h3>
+        <p class="text-muted mb-0">Sales Invoice</p>
+    </div>
+    <div class="row mb-3">
+        <div class="col-6">
+            <strong>Invoice:</strong> @Model.InvoiceNumber<br />
+            <strong>Date:</strong> @Model.SaleDate.ToLocalTime().ToString("f")
+        </div>
+        <div class="col-6 text-end">
+            <strong>Customer:</strong> @(Model.Customer?.Name ?? "Walk-in")<br />
+            @Model.Customer?.Phone
+        </div>
+    </div>
+    <table class="table table-bordered">
+        <thead class="table-light"><tr><th>Product</th><th>Qty</th><th>Price</th><th>Disc%</th><th>Total</th></tr></thead>
+        <tbody>
+        @foreach (var line in Model.Items)
+        {
+            <tr>
+                <td>@line.Product.Name</td>
+                <td>@line.Quantity</td>
+                <td>Rs. @line.UnitPrice.ToString("N2")</td>
+                <td>@line.DiscountPercent%</td>
+                <td>Rs. @line.LineTotal.ToString("N2")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <div class="text-end">
+        <p class="mb-1">Subtotal: Rs. @Model.Subtotal.ToString("N2")</p>
+        <p class="mb-1">Tax: Rs. @Model.TaxAmount.ToString("N2")</p>
+        <p class="mb-1">Discount: Rs. @Model.DiscountAmount.ToString("N2")</p>
+        <h5>Grand Total: Rs. @Model.TotalAmount.ToString("N2")</h5>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+@* MartMS *@
+@model IEnumerable<Supplier>
+@{ ViewData["Title"] = "Suppliers"; }
+<div class="page-header">
+    <h2>Suppliers</h2>
+    <a asp-action="Create" class="btn btn-primary">Add Supplier</a>
+</div>
+<div class="card table-card">
+    <table class="table table-hover">
+        <thead><tr><th>Name</th><th>Contact</th><th>Phone</th><th>Email</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Name</td>
+                <td>@s.ContactPerson</td>
+                <td>@s.Phone</td>
+                <td>@s.Email</td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@s.Id" class="btn btn-sm btn-outline-secondary">History</a>
+                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,27 @@
+@* MartMS *@
+@model MartManagement.Web.ViewModels.NotificationSummaryViewModel
+<div class="dropdown">
+    <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        <i class="bi bi-bell"></i>
+        @if (Model.LowStockCount > 0)
+        {
+            <span class="badge-dot">@Model.LowStockCount</span>
+        }
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow notification-menu">
+        <li class="dropdown-header">Inventory alerts</li>
+        @if (Model.LowStockCount == 0)
+        {
+            <li><span class="dropdown-item-text text-muted">No low stock items</span></li>
+        }
+        else
+        {
+            @foreach (var name in Model.LowStockNames)
+            {
+                <li><span class="dropdown-item-text"><i class="bi bi-exclamation-triangle text-warning me-2"></i>@name</span></li>
+            }
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" asp-controller="Inventory" asp-action="Index">View inventory</a></li>
+        }
+    </ul>
+</div>

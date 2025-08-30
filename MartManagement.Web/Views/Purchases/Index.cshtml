@@ -1,0 +1,24 @@
+@* MartMS *@
+@model IEnumerable<Purchase>
+@{ ViewData["Title"] = "Purchases"; }
+<div class="page-header">
+    <h2>Purchases</h2>
+    <a asp-action="Create" class="btn btn-primary">New Purchase</a>
+</div>
+<div class="card table-card">
+    <table class="table table-hover">
+        <thead><tr><th>Invoice</th><th>Supplier</th><th>Total</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.InvoiceNumber</td>
+                <td>@p.Supplier?.Name</td>
+                <td>Rs. @p.TotalAmount.ToString("N2")</td>
+                <td>@p.PurchaseDate.ToLocalTime().ToString("g")</td>
+                <td><a asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Details</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

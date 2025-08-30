@@ -1,0 +1,205 @@
+@* MartMS *@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["PageTitle"] = "Dashboard";
+    ViewData["PageSubtitle"] = DateTime.Now.ToString("dddd, MMMM d, yyyy");
+}
+<partial name="_PageHeader" />
+
+<div class="quick-actions mb-4">
+    <a class="quick-action-btn" asp-controller="Sales" asp-action="Create"><i class="bi bi-cart-plus"></i> New sale</a>
+    <a class="quick-action-btn" asp-controller="Purchases" asp-action="Create"><i class="bi bi-bag-plus"></i> Record purchase</a>
+    <a class="quick-action-btn" asp-controller="Products" asp-action="Create"><i class="bi bi-plus-lg"></i> Add product</a>
+    <a class="quick-action-btn" asp-controller="Inventory" asp-action="Adjust"><i class="bi bi-arrow-left-right"></i> Adjust stock</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card kpi-card kpi-success">
+            <div class="kpi-icon"><i class="bi bi-currency-rupee"></i></div>
+            <div class="kpi-value">Rs. @Model.TotalSalesToday.ToString("N0")</div>
+            <div class="kpi-label">Revenue today (@Model.SalesCountToday sales)</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card kpi-card kpi-primary">
+            <div class="kpi-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="kpi-value">Rs. @Model.TotalSalesMonth.ToString("N0")</div>
+            <div class="kpi-label">Sales this month</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card kpi-card kpi-accent">
+            <div class="kpi-icon"><i class="bi bi-box-seam"></i></div>
+            <div class="kpi-value">@Model.TotalProducts</div>
+            <div class="kpi-label">Active products</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card kpi-card kpi-warning">
+            <div class="kpi-icon"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="kpi-value">@Model.LowStockCount</div>
+            <div class="kpi-label">Low stock alerts</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card card-panel">
+            <div class="text-muted small">Inventory value (at cost)</div>
+            <div class="fs-4 fw-bold mt-1">Rs. @Model.InventoryValue.ToString("N2")</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-panel">
+            <div class="text-muted small">Purchases this month</div>
+            <div class="fs-4 fw-bold mt-1">Rs. @Model.TotalPurchasesMonth.ToString("N2")</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-panel">
+            <div class="text-muted small">Customers · Suppliers</div>
+            <div class="fs-4 fw-bold mt-1">@Model.TotalCustomers <span class="text-muted fs-6 fw-normal">/</span> @Model.TotalSuppliers</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card chart-card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Revenue trend (7 days)</span>
+                <span class="badge text-bg-light">Live from sales</span>
+            </div>
+            <div class="card-body"><canvas id="salesWeekChart" height="90"></canvas></div>
+        </div>
+        <div class="card chart-card">
+            <div class="card-header">Monthly sales</div>
+            <div class="card-body"><canvas id="salesMonthChart" height="90"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card chart-card mb-3">
+            <div class="card-header">Top selling products</div>
+            <div class="card-body p-0">
+                @if (!Model.TopSellingProducts.Any())
+                {
+                    <div class="p-4 text-center text-muted small">No sales recorded yet.</div>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var p in Model.TopSellingProducts)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">@p.Name</div>
+                                    <small class="text-muted">@p.Sku · @p.QuantitySold sold</small>
+                                </div>
+                                <span class="fw-semibold">Rs. @p.Revenue.ToString("N0")</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="card chart-card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Low stock</span>
+                <a asp-controller="Inventory" asp-action="Index" class="small">View all</a>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.LowStockProducts.Any())
+                {
+                    <div class="p-4 text-center text-muted small">Stock levels are healthy.</div>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var p in Model.LowStockProducts)
+                        {
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>@p.Name</span>
+                                <span class="low-stock">@p.StockQuantity / @p.ReorderLevel</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header chart-card">Recent transactions</div>
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead><tr><th>Invoice</th><th>Type</th><th>Party</th><th class="text-end">Amount</th><th>Date</th></tr></thead>
+            <tbody>
+            @if (!Model.RecentTransactions.Any())
+            {
+                <tr><td colspan="5" class="text-center text-muted py-4">No transactions yet. Create a sale or purchase to get started.</td></tr>
+            }
+            @foreach (var t in Model.RecentTransactions)
+            {
+                var url = t.Type == "Sale"
+                    ? Url.Action("Details", "Sales", new { id = t.Id })
+                    : Url.Action("Details", "Purchases", new { id = t.Id });
+                <tr>
+                    <td><a href="@url" class="fw-semibold">@t.InvoiceNumber</a></td>
+                    <td><span class="badge rounded-pill bg-@(t.Type == "Sale" ? "success" : "info")-subtle text-@(t.Type == "Sale" ? "success" : "info")">@t.Type</span></td>
+                    <td>@t.PartyName</td>
+                    <td class="text-end fw-semibold">Rs. @t.Amount.ToString("N2")</td>
+                    <td class="text-muted">@t.Date.ToLocalTime().ToString("g")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const chartDefaults = {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.2)' } },
+            x: { grid: { display: false } }
+        }
+    };
+    const weekLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SalesLast7Days.Select(c => c.Label)));
+    const weekData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SalesLast7Days.Select(c => c.Value)));
+    new Chart(document.getElementById('salesWeekChart'), {
+        type: 'line',
+        data: {
+            labels: weekLabels,
+            datasets: [{
+                label: 'Sales',
+                data: weekData,
+                borderColor: '#0d9488',
+                backgroundColor: 'rgba(13,148,136,0.12)',
+                fill: true,
+                tension: 0.35
+            }]
+        },
+        options: chartDefaults
+    });
+    const monthLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlySales.Select(c => c.Label)));
+    const monthData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlySales.Select(c => c.Value)));
+    new Chart(document.getElementById('salesMonthChart'), {
+        type: 'bar',
+        data: {
+            labels: monthLabels,
+            datasets: [{
+                data: monthData,
+                backgroundColor: 'rgba(99,102,241,0.75)',
+                borderRadius: 6
+            }]
+        },
+        options: chartDefaults
+    });
+</script>
+}

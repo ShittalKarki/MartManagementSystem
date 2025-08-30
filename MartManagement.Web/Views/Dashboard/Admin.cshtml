@@ -1,0 +1,98 @@
+@* MartMS *@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["PageTitle"] = "Admin Dashboard";
+    ViewData["PageSubtitle"] = DateTime.Now.ToString("dddd, d MMMM yyyy");
+}
+<partial name="_PageHeader" />
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card kpi-primary p-3">
+            <div class="kpi-label">Products</div>
+            <div class="kpi-value">@Model.TotalProducts</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card kpi-success p-3">
+            <div class="kpi-label">Sales Today</div>
+            <div class="kpi-value">Rs. @Model.TotalSalesToday.ToString("N0")</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card kpi-accent p-3">
+            <div class="kpi-label">Revenue (month)</div>
+            <div class="kpi-value">Rs. @Model.TotalSalesMonth.ToString("N0")</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card kpi-warning p-3">
+            <div class="kpi-label">Low stock</div>
+            <div class="kpi-value">@Model.LowStockCount</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card p-3">
+            <h6 class="mb-3">Sales this week</h6>
+            <canvas id="weekChart" height="100"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card p-3">
+            <h6 class="mb-3">Low stock items</h6>
+            @if (!Model.LowStockProducts.Any())
+            {
+                <p class="text-muted small mb-0">All stock levels are OK.</p>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var p in Model.LowStockProducts)
+                    {
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span>@p.Name</span>
+                            <span class="low-stock">@p.StockQuantity</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header bg-white fw-semibold">Recent sales</div>
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead><tr><th>Invoice</th><th>Customer</th><th>Amount</th><th>Date</th></tr></thead>
+            <tbody>
+            @foreach (var t in Model.RecentTransactions)
+            {
+                <tr>
+                    <td><a asp-controller="Sales" asp-action="Details" asp-route-id="@t.Id">@t.InvoiceNumber</a></td>
+                    <td>@t.PartyName</td>
+                    <td>Rs. @t.Amount.ToString("N2")</td>
+                    <td>@t.Date.ToLocalTime().ToString("g")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    new Chart(document.getElementById('weekChart'), {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SalesLast7Days.Select(x => x.Label))),
+            datasets: [{ data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SalesLast7Days.Select(x => x.Value))), borderColor: '#0d9488', tension: 0.3, fill: false }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+</script>
+}

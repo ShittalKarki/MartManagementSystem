@@ -1,0 +1,100 @@
+@* MartMS *@
+@model ProductFormViewModel
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Add Product" : "Edit Product";
+    ViewData["PageTitle"] = ViewData["Title"];
+    ViewData["BreadcrumbParent"] = "Products";
+    ViewData["BreadcrumbParentUrl"] = Url.Action("Index");
+}
+<partial name="_PageHeader" />
+
+<div class="card card-panel" style="max-width: 900px;">
+    <form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="form-floating">
+                    <input asp-for="Sku" class="form-control" placeholder="SKU" />
+                    <label asp-for="Sku"></label>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-floating">
+                    <input asp-for="Name" class="form-control" placeholder="Name" />
+                    <label asp-for="Name"></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select"></select>
+                    <label asp-for="CategoryId"></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input asp-for="Barcode" class="form-control" placeholder="Barcode" />
+                    <label asp-for="Barcode"></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input asp-for="Unit" class="form-control" placeholder="Unit" />
+                    <label asp-for="Unit"></label>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-floating">
+                    <textarea asp-for="Description" class="form-control" placeholder="Description" style="height:80px"></textarea>
+                    <label asp-for="Description"></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input asp-for="PurchasePrice" class="form-control" />
+                    <label asp-for="PurchasePrice"></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input asp-for="SellingPrice" class="form-control" />
+                    <label asp-for="SellingPrice"></label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-floating">
+                    <input asp-for="TaxPercent" class="form-control" />
+                    <label asp-for="TaxPercent"></label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-floating">
+                    <input asp-for="StockQuantity" class="form-control" />
+                    <label asp-for="StockQuantity"></label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-floating">
+                    <input asp-for="ReorderLevel" class="form-control" />
+                    <label asp-for="ReorderLevel"></label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ImageFile" class="form-label">Product image</label>
+                <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <div class="form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4">Save product</button>
+            <a asp-action="Index" class="btn btn-light">Cancel</a>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

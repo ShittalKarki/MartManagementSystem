@@ -1,0 +1,54 @@
+@* MartMS *@
+@model StaffDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["PageTitle"] = "Staff Dashboard";
+    ViewData["PageSubtitle"] = "Quick overview for today";
+}
+<partial name="_PageHeader" />
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card kpi-card kpi-success p-3">
+            <div class="kpi-label">Today's sales</div>
+            <div class="kpi-value">Rs. @Model.SalesToday.ToString("N2")</div>
+            <small class="text-muted">@Model.SalesCountToday transaction(s)</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card kpi-card kpi-warning p-3">
+            <div class="kpi-label">Low stock alerts</div>
+            <div class="kpi-value">@Model.LowStockCount</div>
+        </div>
+    </div>
+    <div class="col-md-4 d-flex align-items-stretch">
+        <div class="card p-3 w-100 d-flex flex-column justify-content-center gap-2">
+            <a asp-controller="Sales" asp-action="Create" class="btn btn-primary"><i class="bi bi-cart-plus me-1"></i> New Sale</a>
+            <a asp-controller="Inventory" asp-action="Adjust" class="btn btn-outline-secondary"><i class="bi bi-boxes me-1"></i> Update stock</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white fw-semibold">Recent sales</div>
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead><tr><th>Invoice</th><th>Customer</th><th>Amount</th><th></th></tr></thead>
+            <tbody>
+            @if (!Model.RecentSales.Any())
+            {
+                <tr><td colspan="4" class="text-muted text-center py-4">No sales yet today. Create a new sale to get started.</td></tr>
+            }
+            @foreach (var s in Model.RecentSales)
+            {
+                <tr>
+                    <td>@s.InvoiceNumber</td>
+                    <td>@s.PartyName</td>
+                    <td>Rs. @s.Amount.ToString("N2")</td>
+                    <td><a asp-controller="Sales" asp-action="Invoice" asp-route-id="@s.Id" class="btn btn-sm btn-light">Invoice</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

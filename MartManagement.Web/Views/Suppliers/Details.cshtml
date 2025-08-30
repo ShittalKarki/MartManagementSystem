@@ -1,0 +1,21 @@
+@* MartMS *@
+@model Supplier
+@{ ViewData["Title"] = Model.Name; }
+<div class="page-header"><h2>@Model.Name</h2></div>
+<div class="card p-3 mb-3"><p class="mb-0">@Model.Phone · @Model.Email · @Model.Address</p></div>
+<div class="card table-card">
+    <div class="card-header bg-white"><strong>Purchase History</strong></div>
+    <table class="table mb-0">
+        <thead><tr><th>Invoice</th><th>Date</th><th>Total</th></tr></thead>
+        <tbody>
+        @foreach (var p in Model.Purchases)
+        {
+            <tr>
+                <td><a asp-controller="Purchases" asp-action="Details" asp-route-id="@p.Id">@p.InvoiceNumber</a></td>
+                <td>@p.PurchaseDate.ToLocalTime().ToString("g")</td>
+                <td>Rs. @p.TotalAmount.ToString("N2")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
