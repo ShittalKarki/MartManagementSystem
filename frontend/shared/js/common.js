@@ -3,7 +3,7 @@
  */
 
 // API Base URL
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5171/api';
 
 // Set active navigation item based on current page
 document.addEventListener('DOMContentLoaded', function() {
@@ -92,13 +92,24 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
     
     try {
         const response = await fetch(url, options);
-        
+        // Log response details for easier debugging
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'API request failed');
+            const text = await response.text();
+            let message = text;
+            try {
+                const errorData = JSON.parse(text || '{}');
+                message = errorData.message || JSON.stringify(errorData) || text;
+            } catch {
+                // not JSON
+            }
+            console.error('API error', response.status, url, message);
+            throw new Error(message || `API request failed (${response.status})`);
         }
-        
-        return await response.json();
+
+        // Try to parse JSON, but handle empty responses
+        const bodyText = await response.text();
+        if (!bodyText) return null;
+        return JSON.parse(bodyText);
     } catch (error) {
         console.error('API request error:', error);
         showToast(error.message, 'error');
