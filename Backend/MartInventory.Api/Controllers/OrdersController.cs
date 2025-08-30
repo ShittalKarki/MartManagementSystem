@@ -43,18 +43,82 @@ namespace MartInventory.Api.Controllers
 		[HttpPost("sale")]
 		public async Task<ActionResult<SalesOrder>> CreateSale(SalesOrder so)
 		{
-			so.InvoiceNumber = $"SO-{DateTime.UtcNow:yyyyMMddHHmmssfff}";
-			var created = await _inventoryService.CreateSaleAsync(so);
-			await BroadcastStockChangesAsync(created.Lines.Select(l => l.ProductId));
-			return CreatedAtAction(nameof(GetSaleById), new { id = created.Id }, created);
+			try
+			{
+				so.InvoiceNumber = $"SO-{DateTime.UtcNow:yyyyMMddHHmmssfff}";
+				var created = await _inventoryService.CreateSaleAsync(so);
+				await BroadcastStockChangesAsync(created.Lines.Select(l => l.ProductId));
+				return CreatedAtAction(nameof(GetSaleById), new { id = created.Id }, created);
+			}
+			catch (InvalidOperationException ex)
+			{
+				return BadRequest(new { message = ex.Message });
+			}
+		}
+
+		[HttpGet("sales")]
+		public async Task<ActionResult<IEnumerable<SalesOrder>>> GetAllSales()
+		{
+			return await _db.SalesOrders
+				.Include(so => so.Lines)
+				.ThenInclude(l => l.Product)
+				.Include(so => so.Customer)
+				.OrderByDescending(so => so.SoldAt)
+				.ToListAsync();
 		}
 
 		[HttpGet("sale/{id}")]
 		public async Task<ActionResult<SalesOrder>> GetSaleById(int id)
 		{
-			var so = await _db.SalesOrders.Include(p => p.Lines).ThenInclude(l => l.Product).FirstOrDefaultAsync(p => p.Id == id);
+			var so = await _db.SalesOrders
+				.Include(p => p.Lines)
+				.ThenInclude(l => l.Product)
+				.Include(p => p.Customer)
+				.FirstOrDefaultAsync(p => p.Id == id);
 			if (so == null) return NotFound();
 			return so;
+		}
+
+		[HttpPut("sale/{id}")]
+		public async Task<IActionResult> UpdateSale(int id, SalesOrder so)
+		{
+			if (id != so.Id) return BadRequest(new { message = "Sale ID mismatch." });
+
+			try
+			{
+				var updated = await _inventoryService.UpdateSaleAsync(id, so);
+				await BroadcastStockChangesAsync(updated.Lines.Select(l => l.ProductId));
+				return NoContent();
+			}
+			catch (KeyNotFoundException)
+			{
+				return NotFound();
+			}
+			catch (InvalidOperationException ex)
+			{
+				return BadRequest(new { message = ex.Message });
+			}
+		}
+
+		[HttpDelete("sale/{id}")]
+		public async Task<IActionResult> DeleteSale(int id)
+		{
+			try
+			{
+				var so = await _db.SalesOrders
+					.Include(s => s.Lines)
+					.FirstOrDefaultAsync(s => s.Id == id);
+				if (so == null) return NotFound();
+
+				var productIds = so.Lines.Select(l => l.ProductId).ToList();
+				await _inventoryService.DeleteSaleAsync(id);
+				await BroadcastStockChangesAsync(productIds);
+				return NoContent();
+			}
+			catch (KeyNotFoundException)
+			{
+				return NotFound();
+			}
 		}
 
 		[HttpGet("alerts")]
