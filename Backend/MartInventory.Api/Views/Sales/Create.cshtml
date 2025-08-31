@@ -1,0 +1,41 @@
+@model CreateSaleViewModel
+@{
+    ViewData["Title"] = "Create Sale";
+}
+
+<div class="card mt-3"><div class="card-body">
+    <form asp-action="Create" method="post" id="saleForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Customer</label>
+                <select name="CustomerId" class="form-select">
+                    <option value="">Walk-in Customer</option>
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <option value="@customer.Id">@customer.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table" id="saleLinesTable">
+                <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Discount %</th><th>VAT %</th><th></th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <button type="button" id="addLineBtn" class="btn btn-outline-primary btn-sm">Add Line</button>
+        <button type="submit" class="btn btn-primary">Create Invoice</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div></div>
+
+<script type="application/json" id="productsData">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Products.Select(x => new { x.Id, x.Name, x.SellingPrice, x.VatPercent })))</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/sales-form.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,39 @@
+@model EntityListViewModel<Customer>
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<div class="card mt-3"><div class="card-body">
+    <form method="get" class="row g-2">
+        <div class="col-md-4"><input name="search" value="@Model.Search" class="form-control" placeholder="Search customer" /></div>
+        <div class="col-auto"><button class="btn btn-primary">Filter</button></div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="col-auto ms-auto"><a asp-action="Create" class="btn btn-success">Add Customer</a></div>
+        }
+    </form>
+</div></div>
+
+<div class="card mt-3"><div class="table-responsive">
+<table class="table mb-0">
+    <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var item in Model.PagedItems.Items)
+    {
+        <tr>
+            <td>@item.Name</td><td>@item.Phone</td><td>@item.Email</td>
+            <td class="text-end">
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return mart.confirmSubmit('Delete this customer?');">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div></div>

@@ -1,0 +1,41 @@
+@model CreatePurchaseViewModel
+@{
+    ViewData["Title"] = "Create Purchase";
+}
+
+<div class="card mt-3"><div class="card-body">
+    <form asp-action="Create" method="post" id="purchaseForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Supplier</label>
+                <select name="VendorId" class="form-select" required>
+                    <option value="">Select supplier</option>
+                    @foreach (var vendor in Model.Vendors)
+                    {
+                        <option value="@vendor.Id">@vendor.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table" id="purchaseLinesTable">
+                <thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th></th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <button type="button" id="addLineBtn" class="btn btn-outline-primary btn-sm">Add Line</button>
+        <button type="submit" class="btn btn-primary">Create Purchase</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div></div>
+
+<script type="application/json" id="productsData">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Products.Select(x => new { x.Id, x.Name, x.PurchasePrice })))</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/purchase-form.js" asp-append-version="true"></script>
+}

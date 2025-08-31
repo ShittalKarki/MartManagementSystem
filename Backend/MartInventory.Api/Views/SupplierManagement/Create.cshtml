@@ -1,0 +1,13 @@
+@model VendorFormViewModel
+@{
+    ViewData["Title"] = "Create Supplier";
+}
+<div class="card mt-3"><div class="card-body">
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <partial name="_SupplierForm" model="Model" />
+    <button class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,19 @@
+@model ProductFormViewModel
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+<div class="card mt-3">
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <partial name="_ProductForm" model="Model" />
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

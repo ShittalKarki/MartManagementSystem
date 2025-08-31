@@ -1,0 +1,60 @@
+@model ProductFormViewModel
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <label asp-for="Sku" class="form-label"></label>
+        <input asp-for="Sku" class="form-control" />
+        <span asp-validation-for="Sku" class="text-danger"></span>
+    </div>
+    <div class="col-md-8">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Unit" class="form-label"></label>
+        <input asp-for="Unit" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Barcode" class="form-label"></label>
+        <input asp-for="Barcode" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="StockOnHand" class="form-label"></label>
+        <input asp-for="StockOnHand" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="PurchasePrice" class="form-label"></label>
+        <input asp-for="PurchasePrice" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="SellingPrice" class="form-label"></label>
+        <input asp-for="SellingPrice" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="VatPercent" class="form-label"></label>
+        <input asp-for="VatPercent" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="ReorderLevel" class="form-label"></label>
+        <input asp-for="ReorderLevel" class="form-control" />
+    </div>
+</div>

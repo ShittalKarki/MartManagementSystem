@@ -1,0 +1,69 @@
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="card mt-3"><div class="card-body">
+    <form id="reportFilter" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">From</label>
+            <input class="form-control" type="date" id="startDate" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">To</label>
+            <input class="form-control" type="date" id="endDate" />
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary" type="submit">Generate</button>
+        </div>
+        <div class="col-auto">
+            <a class="btn btn-outline-secondary" href="/api/reports/sales/csv">Export Sales CSV</a>
+        </div>
+        <div class="col-auto">
+            <a class="btn btn-outline-secondary" href="/api/reports/purchases/csv">Export Purchases CSV</a>
+        </div>
+    </form>
+</div></div>
+
+<div class="row g-3 mt-1" id="summaryCards">
+    <div class="col-md-3"><div class="card p-3"><small>Total Sales</small><div class="h4" id="sumSales">NPR 0.00</div></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Total Purchases</small><div class="h4" id="sumPurchases">NPR 0.00</div></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Sales Orders</small><div class="h4" id="sumSalesOrders">0</div></div></div>
+    <div class="col-md-3"><div class="card p-3"><small>Low Stock Items</small><div class="h4 text-danger" id="sumLowStock">0</div></div></div>
+</div>
+
+@section Scripts {
+<script>
+(() => {
+    const startEl = document.getElementById("startDate");
+    const endEl = document.getElementById("endDate");
+    const filter = document.getElementById("reportFilter");
+
+    const money = (value) => `NPR ${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    const load = async () => {
+        const query = new URLSearchParams();
+        if (startEl.value) query.append("startDate", startEl.value);
+        if (endEl.value) query.append("endDate", endEl.value);
+
+        const response = await fetch(`/reports/summary?${query.toString()}`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        document.getElementById("sumSales").textContent = money(data.totalSales);
+        document.getElementById("sumPurchases").textContent = money(data.totalPurchases);
+        document.getElementById("sumSalesOrders").textContent = data.salesOrders;
+        document.getElementById("sumLowStock").textContent = data.lowStockItems;
+    };
+
+    filter.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        await load();
+    });
+
+    const today = new Date().toISOString().slice(0, 10);
+    startEl.value = today;
+    endEl.value = today;
+    load();
+})();
+</script>
+}

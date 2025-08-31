@@ -1,0 +1,41 @@
+@model SalesOrder
+@{
+    ViewData["Title"] = "Sales Invoice";
+}
+
+<div class="card mt-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4>Invoice @Model.InvoiceNumber</h4>
+                <div class="text-muted">Date: @Model.SoldAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div>
+                <div class="text-muted">Customer: @(Model.Customer?.Name ?? "Walk-in")</div>
+            </div>
+            <button onclick="window.print();" class="btn btn-outline-secondary">Print</button>
+        </div>
+
+        <table class="table mt-3">
+            <thead><tr><th>Product</th><th>Qty</th><th>Rate</th><th>Discount%</th><th>VAT%</th><th>Total</th></tr></thead>
+            <tbody>
+                @foreach (var line in Model.Lines)
+                {
+                    <tr>
+                        <td>@line.Product.Name</td>
+                        <td>@line.Quantity</td>
+                        <td>@line.UnitPrice.ToString("N2")</td>
+                        <td>@line.DiscountPercent</td>
+                        <td>@line.VatPercent</td>
+                        <td>@line.LineTotal.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="text-end">
+            <div>Subtotal: NPR @Model.Subtotal.ToString("N2")</div>
+            <div>Discount: NPR @Model.DiscountAmount.ToString("N2")</div>
+            <div>VAT: NPR @Model.VatAmount.ToString("N2")</div>
+            <h5>Total: NPR @Model.TotalAmount.ToString("N2")</h5>
+        </div>
+    </div>
+</div>

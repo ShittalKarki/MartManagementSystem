@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mart Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="app-shell">
+            <aside class="sidebar">
+                <div class="sidebar-brand">Mart Manager</div>
+                <a asp-controller="Dashboard" asp-action="Index"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a asp-controller="ProductManagement" asp-action="Index"><i class="bi bi-box-seam"></i> Products</a>
+                <a asp-controller="CategoryManagement" asp-action="Index"><i class="bi bi-tags"></i> Categories</a>
+                <a asp-controller="SupplierManagement" asp-action="Index"><i class="bi bi-truck"></i> Suppliers</a>
+                <a asp-controller="CustomerManagement" asp-action="Index"><i class="bi bi-people"></i> Customers</a>
+                <a asp-controller="Purchases" asp-action="Index"><i class="bi bi-cart-plus"></i> Purchases</a>
+                <a asp-controller="Sales" asp-action="Index"><i class="bi bi-receipt"></i> Sales</a>
+                <a asp-controller="ReportsManagement" asp-action="Index"><i class="bi bi-graph-up"></i> Reports</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="UserManagement" asp-action="Index"><i class="bi bi-person-gear"></i> Users</a>
+                }
+            </aside>
+            <main class="content">
+                <nav class="topbar">
+                    <div class="topbar-title">@ViewData["Title"]</div>
+                    <div class="topbar-actions">
+                        <span class="text-muted small me-3">@User.Identity?.Name</span>
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                        </form>
+                    </div>
+                </nav>
+                <div class="container-fluid px-0">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success mt-3">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+                    }
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+    }
+    else
+    {
+        <main class="auth-shell">
+            @RenderBody()
+        </main>
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

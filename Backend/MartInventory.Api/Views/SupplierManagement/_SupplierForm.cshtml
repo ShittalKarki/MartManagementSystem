@@ -1,0 +1,15 @@
+@model VendorFormViewModel
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ContactPerson" class="form-label"></label>
+        <input asp-for="ContactPerson" class="form-control" />
+    </div>
+    <div class="col-md-4"><label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control" /></div>
+    <div class="col-md-4"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /></div>
+    <div class="col-md-4"><label asp-for="Address" class="form-label"></label><input asp-for="Address" class="form-control" /></div>
+</div>
