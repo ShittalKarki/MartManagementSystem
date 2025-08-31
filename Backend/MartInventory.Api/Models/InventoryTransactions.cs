@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
 namespace MartInventory.Api.Models
 {
 	public class PurchaseOrder
@@ -17,8 +20,13 @@ namespace MartInventory.Api.Models
 	{
 		public int Id { get; set; }
 		public int PurchaseOrderId { get; set; }
+
+		[ValidateNever]
 		public PurchaseOrder PurchaseOrder { get; set; } = null!;
+
 		public int ProductId { get; set; }
+
+		[ValidateNever]
 		public Product Product { get; set; } = null!;
 		public int Quantity { get; set; }
 		public decimal UnitPrice { get; set; }
@@ -38,14 +46,28 @@ namespace MartInventory.Api.Models
 		public decimal TotalAmount { get; set; }
 		public string Currency { get; set; } = "NPR";
 		public string InvoiceNumber { get; set; } = string.Empty;
+
+		[NotMapped]
+		public string? CustomerName { get; set; }
+
+		[NotMapped]
+		public decimal OrderDiscountPercent { get; set; }
+
+		[NotMapped]
+		public decimal OrderDiscountAmount { get; set; }
 	}
 
 	public class SalesOrderLine
 	{
 		public int Id { get; set; }
 		public int SalesOrderId { get; set; }
+
+		[ValidateNever]
 		public SalesOrder SalesOrder { get; set; } = null!;
+
 		public int ProductId { get; set; }
+
+		[ValidateNever]
 		public Product Product { get; set; } = null!;
 		public int Quantity { get; set; }
 		public decimal UnitPrice { get; set; }
