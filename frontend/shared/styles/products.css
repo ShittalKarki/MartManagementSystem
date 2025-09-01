@@ -56,7 +56,7 @@
     padding: 20px;
 }
 
-/* Form Styles */
+/* form styles */
 .form-group {
     margin-bottom: 15px;
 }
@@ -107,7 +107,7 @@ textarea {
     background-color: #7f8c8d;
 }
 
-/* Product Table Actions */
+/* Product table actions */
 .action-buttons {
     display: flex;
     gap: 5px;
