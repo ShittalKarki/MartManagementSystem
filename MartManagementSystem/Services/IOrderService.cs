@@ -17,6 +17,11 @@ namespace MartManagementSystem.Services
         public int TotalOrders { get; set; }
         public int TotalProducts { get; set; }
         public int TotalCustomers { get; set; }
+        public decimal AverageOrderValue { get; set; }
+        public string TopSellingProduct { get; set; } = "N/A";
+        public string TopCustomerName { get; set; } = "N/A";
+        public decimal TopCustomerRevenue { get; set; }
+        public List<decimal> LastSevenDaysSales { get; set; } = new List<decimal>();
         public IEnumerable<Product> LowStockProducts { get; set; } = new List<Product>();
         public IEnumerable<Order> RecentOrders { get; set; } = new List<Order>();
     }

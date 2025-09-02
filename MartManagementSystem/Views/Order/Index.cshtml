@@ -14,24 +14,18 @@
     </a>
 </div>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        @TempData["SuccessMessage"]
-    </div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-        @TempData["ErrorMessage"]
-    </div>
-}
-
 <div class="panel">
+    <!-- Live Search Bar -->
+    <div style="position: relative; width: 100%; margin-bottom: 1.5rem;">
+        <input type="text" id="orderSearch" class="form-control" placeholder="Search orders by ID, customer name, product name..." style="padding-left: 2.75rem;" />
+        <svg style="position: absolute; left: 1rem; top: 13px; color: var(--text-3);" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+    </div>
+
     <div class="table-responsive">
-        <table class="custom-table">
+        <table class="custom-table" id="orders-table">
             <thead>
                 <tr>
                     <th>Order ID</th>
@@ -51,14 +45,17 @@
                     {
                         var unitPrice = o.Product?.Price ?? 0;
                         var totalCost = o.Quantity * unitPrice;
-                        <tr>
-                            <td>#@o.Id</td>
-                            <td style="font-weight: 600;">@(o.Customer?.FullName ?? "Deleted Customer")</td>
-                            <td>@(o.Product?.Name ?? "Deleted Product")</td>
-                            <td>@o.Quantity</td>
-                            <td>$@unitPrice.ToString("N2")</td>
-                            <td style="color: var(--accent-blue); font-weight: 600;">$@totalCost.ToString("N2")</td>
-                            <td>@o.OrderDate.ToString("MM/dd/yyyy HH:mm")</td>
+                        var custName = o.Customer?.FullName ?? "Deleted Customer";
+                        var prodName = o.Product?.Name ?? "Deleted Product";
+                        
+                        <tr class="order-row" data-customer="@custName.ToLower()" data-product="@prodName.ToLower()" data-id="@o.Id">
+                            <td><span class="table-id">#@o.Id</span></td>
+                            <td style="font-weight: 600;">@custName</td>
+                            <td>@prodName</td>
+                            <td style="font-variant-numeric: tabular-nums;">@o.Quantity</td>
+                            <td style="font-variant-numeric: tabular-nums;">$@unitPrice.ToString("N2")</td>
+                            <td style="color: var(--accent-blue); font-weight: 600; font-variant-numeric: tabular-nums;">$@totalCost.ToString("N2")</td>
+                            <td class="table-mono">@o.OrderDate.ToString("MM/dd/yyyy HH:mm")</td>
                             <td style="text-align: right;">
                                 <form asp-action="Delete" asp-route-id="@o.Id" method="post" onsubmit="return confirm('Are you sure you want to cancel this order? This will restock the items.');" style="display:inline;">
                                     @Html.AntiForgeryToken()
@@ -69,6 +66,16 @@
                             </td>
                         </tr>
                     }
+
+                    <!-- Empty Search Result Template Row -->
+                    <tr id="empty-search-row" style="display: none;">
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <div class="empty-state-text">No order logs match your search query.</div>
+                            </div>
+                        </td>
+                    </tr>
                 }
                 else
                 {
@@ -82,3 +89,38 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("orderSearch");
+            const rows = document.querySelectorAll(".order-row");
+            const emptyStateRow = document.getElementById("empty-search-row");
+
+            if (searchInput) {
+                searchInput.addEventListener("input", function() {
+                    const query = searchInput.value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    rows.forEach(row => {
+                        const customer = row.getAttribute("data-customer") || "";
+                        const product = row.getAttribute("data-product") || "";
+                        const id = row.getAttribute("data-id") || "";
+
+                        const match = customer.includes(query) || product.includes(query) || id.includes(query);
+                        if (match) {
+                            row.style.display = "";
+                            visibleCount++;
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+
+                    if (emptyStateRow) {
+                        emptyStateRow.style.display = (visibleCount === 0 && rows.length > 0) ? "" : "none";
+                    }
+                });
+            }
+        });
+    </script>
+}

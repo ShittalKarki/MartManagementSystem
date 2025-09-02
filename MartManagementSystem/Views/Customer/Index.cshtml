@@ -15,8 +15,17 @@
 </div>
 
 <div class="panel">
+    <!-- Live Search Bar -->
+    <div style="position: relative; width: 100%; margin-bottom: 1.5rem;">
+        <input type="text" id="customerSearch" class="form-control" placeholder="Search customers by ID, name, email..." style="padding-left: 2.75rem;" />
+        <svg style="position: absolute; left: 1rem; top: 13px; color: var(--text-3);" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+    </div>
+
     <div class="table-responsive">
-        <table class="custom-table">
+        <table class="custom-table" id="customers-table">
             <thead>
                 <tr>
                     <th>Customer ID</th>
@@ -30,8 +39,8 @@
                 {
                     @foreach (var c in Model)
                     {
-                        <tr>
-                            <td>#@c.Id</td>
+                        <tr class="customer-row" data-name="@c.FullName.ToLower()" data-email="@c.Email.ToLower()" data-id="@c.Id">
+                            <td><span class="table-id">#@c.Id</span></td>
                             <td style="font-weight: 600;">@c.FullName</td>
                             <td>@c.Email</td>
                             <td style="text-align: right;">
@@ -49,6 +58,16 @@
                             </td>
                         </tr>
                     }
+
+                    <!-- Empty Search Result Template Row -->
+                    <tr id="empty-search-row" style="display: none;">
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <div class="empty-state-text">No customers match your search query.</div>
+                            </div>
+                        </td>
+                    </tr>
                 }
                 else
                 {
@@ -62,3 +81,38 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("customerSearch");
+            const rows = document.querySelectorAll(".customer-row");
+            const emptyStateRow = document.getElementById("empty-search-row");
+
+            if (searchInput) {
+                searchInput.addEventListener("input", function() {
+                    const query = searchInput.value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    rows.forEach(row => {
+                        const name = row.getAttribute("data-name") || "";
+                        const email = row.getAttribute("data-email") || "";
+                        const id = row.getAttribute("data-id") || "";
+
+                        const match = name.includes(query) || email.includes(query) || id.includes(query);
+                        if (match) {
+                            row.style.display = "";
+                            visibleCount++;
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+
+                    if (emptyStateRow) {
+                        emptyStateRow.style.display = (visibleCount === 0 && rows.length > 0) ? "" : "none";
+                    }
+                });
+            }
+        });
+    </script>
+}

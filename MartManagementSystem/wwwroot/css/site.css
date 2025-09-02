@@ -838,6 +838,21 @@ select.form-control option {
   from { opacity: 0; transform: translateX(24px) scale(0.96); }
   to   { opacity: 1; transform: translateX(0)   scale(1);    }
 }
+.toast-success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--emerald);
+}
+.toast-error {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: var(--rose);
+}
+.toast-info {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: var(--blue);
+}
 
 /* ============================================================
    RESPONSIVE

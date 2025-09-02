@@ -1,7 +1,69 @@
 @model MartManagementSystem.Services.DashboardDto
 @{
     ViewData["Title"] = "Dashboard";
+
+    // Setup coordinates and scaling for SVG sales chart
+    var maxVal = Model.LastSevenDaysSales.Max();
+    if (maxVal == 0) maxVal = 100; // prevent division by zero
+    
+    double width = 600;
+    double height = 180;
+    double padding = 35;
+    double chartW = width - (padding * 2);
+    double chartH = height - (padding * 2);
+
+    var daysOfWeek = new List<string>();
+    var today = DateTime.Today;
+    for (int i = 6; i >= 0; i--)
+    {
+        daysOfWeek.Add(today.AddDays(-i).ToString("ddd"));
+    }
+
+    var pointsList = new List<string>();
+    var areaPointsList = new List<string>();
+    var chartPoints = "";
+    var chartBars = new List<(double x, double y, double h, string dateVal, decimal amt)>();
+
+    // Start coordinate of the fill area
+    areaPointsList.Add($"{padding},{height - padding}");
+
+    for (int i = 0; i < 7; i++)
+    {
+        double x = padding + (chartW / 6.0) * i;
+        double ratio = (double)Model.LastSevenDaysSales[i] / (double)maxVal;
+        double y = (height - padding) - (chartH * ratio);
+        pointsList.Add($"{x},{y}");
+        areaPointsList.Add($"{x},{y}");
+        chartBars.Add((x, y, (height - padding) - y, daysOfWeek[i], Model.LastSevenDaysSales[i]));
+    }
+
+    // End coordinate of the fill area
+    areaPointsList.Add($"{padding + chartW},{height - padding}");
+
+    chartPoints = string.Join(" ", pointsList);
+    var areaPoints = string.Join(" ", areaPointsList);
 }
+
+<style>
+    .dashboard-bottom-grid {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 1.5rem;
+        align-items: start;
+        margin-bottom: 2rem;
+    }
+    @@media (max-width: 992px) {
+        .dashboard-bottom-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .chart-tooltip-group {
+        pointer-events: none;
+    }
+    circle:hover + .chart-tooltip-group {
+        opacity: 1 !important;
+    }
+</style>
 
 <div class="header-wrapper">
     <div>
@@ -10,7 +72,7 @@
     </div>
 </div>
 
-<!-- ── Stats Cards ── -->
+<!-- ── Main Stats Cards ── -->
 <div class="stats-grid">
     <div class="stat-card" style="--card-accent: var(--blue);">
         <div class="stat-icon">
@@ -42,6 +104,103 @@
         </div>
         <div class="stat-label">Customers</div>
         <div class="stat-value">@Model.TotalCustomers</div>
+    </div>
+</div>
+
+<!-- ── Advanced Analytics KPI Grid ── -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-bottom: 2rem;">
+    <div class="stat-card" style="--card-accent: var(--blue); padding: 1.25rem 1.5rem;">
+        <div class="stat-icon" style="width: 32px; height: 32px; margin-bottom: 0.5rem; background: var(--blue-dim); color: var(--blue);">
+            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        </div>
+        <div class="stat-label" style="font-size: 0.7rem;">Average Order Value</div>
+        <div class="stat-value" style="font-size: 1.65rem;">$@Model.AverageOrderValue.ToString("N2")</div>
+    </div>
+
+    <div class="stat-card" style="--card-accent: var(--purple); padding: 1.25rem 1.5rem;">
+        <div class="stat-icon" style="width: 32px; height: 32px; margin-bottom: 0.5rem; background: var(--purple-dim); color: var(--purple);">
+            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        </div>
+        <div class="stat-label" style="font-size: 0.7rem;">Best Selling Product</div>
+        <div class="stat-value" style="font-size: 1.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="@Model.TopSellingProduct">@Model.TopSellingProduct</div>
+    </div>
+
+    <div class="stat-card" style="--card-accent: var(--emerald); padding: 1.25rem 1.5rem;">
+        <div class="stat-icon" style="width: 32px; height: 32px; margin-bottom: 0.5rem; background: var(--emerald-dim); color: var(--emerald);">
+            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path fill="currentColor" d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v3c0 2.21 1.79 4 4 4h2.2c.5 1.5 1.8 2.6 3.4 2.9V19H9v2h6v-2h-3.6v-2.1c1.6-.3 2.9-1.4 3.4-2.9H17c2.21 0 4-1.79 4-4V7c0-1.1-.9-2-2-2zM7 10H5V7h2v3zm12 0h-2V7h2v3z"/></svg>
+        </div>
+        <div class="stat-label" style="font-size: 0.7rem;">Top Buyer (Revenue)</div>
+        <div class="stat-value" style="font-size: 1.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="@Model.TopCustomerName ($@Model.TopCustomerRevenue.ToString("N2"))">
+            @Model.TopCustomerName <span style="font-size: 0.95rem; color: var(--emerald); font-weight: 500;">($@Model.TopCustomerRevenue.ToString("N2"))</span>
+        </div>
+    </div>
+</div>
+
+<!-- ── SVG Sales Performance Chart ── -->
+<div class="panel" style="margin-bottom: 2rem;">
+    <div class="panel-header">
+        <div>
+            <div class="panel-title">Sales Performance</div>
+            <div class="panel-subtitle">Revenue trend over the last 7 days</div>
+        </div>
+    </div>
+    
+    <div style="position: relative; width: 100%; height: 220px; padding: 0.5rem 0;">
+        <svg viewBox="0 0 600 200" width="100%" height="100%" style="overflow: visible;">
+            <defs>
+                <!-- Area Gradient -->
+                <linearGradient id="chart-area-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--blue)" stop-opacity="0.32" />
+                    <stop offset="100%" stop-color="var(--blue)" stop-opacity="0.0" />
+                </linearGradient>
+                
+                <!-- Line Gradient -->
+                <linearGradient id="chart-line-grad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="var(--blue)" />
+                    <stop offset="100%" stop-color="var(--purple)" />
+                </linearGradient>
+
+                <!-- Grid Line Pattern -->
+                <pattern id="grid" width="100" height="20" patternUnits="userSpaceOnUse">
+                    <line x1="0" y1="0" x2="100" y2="0" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                </pattern>
+            </defs>
+
+            <!-- Grid Backdrop -->
+            <rect x="35" y="30" width="530" height="140" fill="url(#grid)" />
+            
+            <!-- Horizontal Axes -->
+            <line x1="35" y1="30" x2="565" y2="30" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+            <line x1="35" y1="100" x2="565" y2="100" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+            <line x1="35" y1="170" x2="565" y2="170" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+
+            <!-- Y Axis helper values -->
+            <text x="28" y="34" font-size="9" font-weight="600" fill="var(--text-3)" text-anchor="end">$@maxVal.ToString("F0")</text>
+            <text x="28" y="104" font-size="9" font-weight="600" fill="var(--text-3)" text-anchor="end">$@((maxVal/2).ToString("F0"))</text>
+            <text x="28" y="174" font-size="9" font-weight="600" fill="var(--text-3)" text-anchor="end">$0</text>
+
+            <!-- Area under line -->
+            <polygon points="@areaPoints" fill="url(#chart-area-grad)" />
+
+            <!-- Line Path -->
+            <polyline points="@chartPoints" fill="none" stroke="url(#chart-line-grad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+            <!-- Interactive Dots & Tooltips -->
+            @for (int i = 0; i < chartBars.Count; i++)
+            {
+                var bar = chartBars[i];
+                <circle cx="@bar.x" cy="@bar.y" r="5" fill="#0c0f1d" stroke="var(--blue)" stroke-width="2.5" style="cursor: pointer;" />
+                
+                <!-- Tooltip values (hidden by default, shown on hover via CSS) -->
+                <g class="chart-tooltip-group" style="opacity: 0; transition: opacity 0.2s ease;">
+                    <rect x="@(bar.x - 45)" y="@(bar.y - 32)" width="90" height="22" rx="6" fill="#14192b" stroke="var(--border-hover)" stroke-width="1" />
+                    @Html.Raw($"<text x='{bar.x}' y='{bar.y - 18}' fill='#fff' font-size='9.5' font-weight='700' text-anchor='middle'>${bar.amt.ToString("N2")}</text>")
+                </g>
+
+                <!-- X Axis Day Label -->
+                @Html.Raw($"<text x='{bar.x}' y='192' font-size='9.5' font-weight='600' fill='var(--text-2)' text-anchor='middle'>{bar.dateVal}</text>")
+            }
+        </svg>
     </div>
 </div>
 
@@ -85,7 +244,7 @@
 </div>
 
 <!-- ── Bottom Grid: Recent Orders + Low Stock ── -->
-<div style="display: grid; grid-template-columns: 3fr 2fr; gap: 1.5rem; align-items: start;">
+<div class="dashboard-bottom-grid">
 
     <!-- Recent Orders -->
     <div class="panel" style="margin-bottom: 0;">
