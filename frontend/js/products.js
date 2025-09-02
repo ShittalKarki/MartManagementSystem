@@ -5,6 +5,7 @@
 // Global variables
 let products = [];
 let categories = [];
+let merchandises = [];
 let editMode = false;
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -13,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load categories for dropdown
     loadCategoriesForDropdown();
+    
+    // Load merchandises for dropdown
+    loadMerchandisesForDropdown();
     
     // Set up event listeners
     document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
@@ -24,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadProducts() {
     try {
         products = await apiRequest('products');
+        console.log('Products loaded from API:', products);
         displayProducts(products);
     } catch (error) {
         console.error('Error loading products:', error);
@@ -36,6 +41,7 @@ async function loadProducts() {
  * @param {Array} products - Products data
  */
 function displayProducts(products) {
+    console.log('Displaying products:', products);
     const tableBody = document.getElementById('productsTableBody');
     
     // Clear existing rows
@@ -50,17 +56,18 @@ function displayProducts(products) {
     }
     
     // Add products to table
-    products.forEach(product => {
+    products.forEach((product, index) => {
+        console.log(`Processing product ${index}:`, product);
         const row = document.createElement('tr');
         
         // Check if stock is below reorder level
-        const stockClass = product.stock <= product.reorderLevel ? 'low-stock' : '';
+        const stockClass = product.stockOnHand <= product.reorderLevel ? 'low-stock' : '';
         
         row.innerHTML = `
             <td>${product.sku || '-'}</td>
             <td>${product.name}</td>
             <td>${product.category ? product.category.name : '-'}</td>
-            <td class="${stockClass}">${product.stock}</td>
+            <td class="${stockClass}">${product.stockOnHand}</td>
             <td>NPR ${formatCurrency(product.purchasePrice)}</td>
             <td>NPR ${formatCurrency(product.sellingPrice)}</td>
             <td>
@@ -89,6 +96,35 @@ async function loadCategoriesForDropdown() {
     } catch (error) {
         console.error('Error loading categories:', error);
     }
+}
+
+/**
+ * Load merchandises for dropdown
+ */
+async function loadMerchandisesForDropdown() {
+    try {
+        const refData = await apiRequest('referencedata/categories');
+        merchandises = refData.merch;
+        populateMerchandiseDropdown('productMerchandise', merchandises);
+    } catch (error) {
+        console.error('Error loading merchandises:', error);
+    }
+}
+
+/**
+ * Populate merchandise dropdown
+ */
+function populateMerchandiseDropdown(selectId, merchandises) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Select Merchandise</option>';
+    merchandises.forEach(merch => {
+        const option = document.createElement('option');
+        option.value = merch.id;
+        option.textContent = merch.name;
+        select.appendChild(option);
+    });
 }
 
 /**
@@ -132,12 +168,13 @@ function editProduct(productId) {
     document.getElementById('productName').value = product.name;
     document.getElementById('productSku').value = product.sku || '';
     document.getElementById('productCategory').value = product.categoryId || '';
+    document.getElementById('productMerchandise').value = product.merchandiseId || '';
     document.getElementById('productDescription').value = product.description || '';
     document.getElementById('productPurchasePrice').value = product.purchasePrice;
     document.getElementById('productSellingPrice').value = product.sellingPrice;
-    document.getElementById('productStock').value = product.stock;
+    document.getElementById('productStock').value = product.stockOnHand;
     document.getElementById('productReorderLevel').value = product.reorderLevel;
-    document.getElementById('productVat').value = product.vat || 13;
+    document.getElementById('productVat').value = product.vatPercent || 13;
     
     // Set edit mode to true
     editMode = true;
@@ -169,7 +206,9 @@ async function deleteProduct(productId) {
         showToast('Product deleted successfully', 'success');
     } catch (error) {
         console.error('Error deleting product:', error);
-        showToast('Failed to delete product', 'error');
+        if (!error.message || error.message === 'API request failed') {
+            showToast('Failed to delete product', 'error');
+        }
     }
 }
 
@@ -182,21 +221,28 @@ async function handleProductSubmit(event) {
     
     // Get form values
     const productId = document.getElementById('productId').value;
+    const categoryId = parseInt(document.getElementById('productCategory').value, 10);
+    const merchandiseId = parseInt(document.getElementById('productMerchandise').value, 10);
+    
     const productData = {
-        name: document.getElementById('productName').value,
-        sku: document.getElementById('productSku').value,
-        categoryId: parseInt(document.getElementById('productCategory').value),
-        description: document.getElementById('productDescription').value,
+        name: document.getElementById('productName').value.trim(),
+        sku: document.getElementById('productSku').value.trim(),
+        categoryId,
+        merchandiseId,
+        description: document.getElementById('productDescription').value.trim(),
         purchasePrice: parseFloat(document.getElementById('productPurchasePrice').value),
         sellingPrice: parseFloat(document.getElementById('productSellingPrice').value),
-        stock: parseInt(document.getElementById('productStock').value),
-        reorderLevel: parseInt(document.getElementById('productReorderLevel').value),
-        vat: parseFloat(document.getElementById('productVat').value)
+        stockOnHand: parseInt(document.getElementById('productStock').value, 10) || 0,
+        reorderLevel: parseInt(document.getElementById('productReorderLevel').value, 10) || 0,
+        vatPercent: parseFloat(document.getElementById('productVat').value) || 0,
+        unit: 'pcs'
     };
+    
+    console.log('Saving product with data:', productData);
     
     try {
         if (editMode) {
-            // Update existing product
+            productData.id = parseInt(productId, 10);
             await apiRequest(`products/${productId}`, 'PUT', productData);
             showToast('Product updated successfully', 'success');
         } else {
@@ -212,6 +258,8 @@ async function handleProductSubmit(event) {
         loadProducts();
     } catch (error) {
         console.error('Error saving product:', error);
-        showToast('Failed to save product', 'error');
+        if (!error.message || error.message === 'API request failed') {
+            showToast('Failed to save product', 'error');
+        }
     }
 }
