@@ -154,7 +154,7 @@ body {
 }
 
 .cart-btn {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    background: linear-gradient(135deg, #c11c1c 0%, #ee5a24 100%);
     border: none;
     color: white;
     padding: 12px 20px;
@@ -169,13 +169,13 @@ body {
 
 .cart-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 5px 15px rgba(101, 11, 11, 0.3);
 }
 
 .cart-count {
     background: white;
     color: #ff6b6b;
-    border-radius: 50%;
+    border-radius: 50%;                                                                                                                                                                                                                                                                                                                                                     
     width: 20px;
     height: 20px;
     display: flex;
@@ -191,13 +191,13 @@ body {
 /* Category Navigation */
 .category-nav {
     background: white;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #cfdff4;
     overflow-x: auto;
 }
 
 .nav-container {
     display: flex;
-    gap: 5px;
+    gap: 10px;
     padding: 15px 30px;
     min-width: max-content;
 }
