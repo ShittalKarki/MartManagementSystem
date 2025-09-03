@@ -2,34 +2,21 @@
  * Sales specific JavaScript
  */
 
-// Global variables
 let sales = [];
 let products = [];
 let currentSale = null;
+let editMode = false;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Set default date to today
     document.getElementById('saleDate').valueAsDate = new Date();
-    
-    // Load sales
     loadSales();
-    
-    // Load products for dropdown
     loadProductsForDropdown();
-    
-    // Set up event listeners
     document.getElementById('salesForm').addEventListener('submit', handleSaleSubmit);
-    
-    // Add initial sale item
-    addSaleItem();
 });
 
-/**
- * Load sales from API
- */
 async function loadSales() {
     try {
-        sales = await apiRequest('sales');
+        sales = await apiRequest('orders/sales');
         displaySales(sales);
     } catch (error) {
         console.error('Error loading sales:', error);
@@ -37,53 +24,43 @@ async function loadSales() {
     }
 }
 
-/**
- * Display sales in table
- * @param {Array} sales - Sales data
- */
-function displaySales(sales) {
+function displaySales(salesList) {
     const tableBody = document.getElementById('salesTableBody');
-    
-    // Clear existing rows
     tableBody.innerHTML = '';
-    
-    // Check if there are any sales
-    if (!sales || sales.length === 0) {
+
+    if (!salesList || salesList.length === 0) {
         const row = document.createElement('tr');
         row.innerHTML = '<td colspan="6" class="no-data">No sales found</td>';
         tableBody.appendChild(row);
         return;
     }
-    
-    // Add sales to table
-    sales.forEach(sale => {
+
+    salesList.forEach(sale => {
         const row = document.createElement('tr');
-        
         row.innerHTML = `
             <td>${sale.invoiceNumber}</td>
-            <td>${sale.customer || 'Walk-in Customer'}</td>
-            <td>${formatDate(sale.date)}</td>
-            <td>${sale.items ? sale.items.length : 0}</td>
+            <td>${sale.customer ? sale.customer.name : 'Walk-in Customer'}</td>
+            <td>${formatDate(sale.soldAt)}</td>
+            <td>${sale.lines ? sale.lines.length : 0}</td>
             <td>NPR ${formatCurrency(sale.totalAmount)}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn btn-sm btn-view" onclick="viewSaleDetails(${sale.id})">
+                    <button class="btn btn-sm btn-view" onclick="viewSaleDetails(${sale.id})" title="View">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-sm btn-delete" onclick="deleteSale(${sale.id})">
+                    <button class="btn btn-sm btn-edit" onclick="editSale(${sale.id})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-delete" onclick="deleteSale(${sale.id})" title="Delete">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             </td>
         `;
-        
         tableBody.appendChild(row);
     });
 }
 
-/**
- * Load products for dropdown
- */
 async function loadProductsForDropdown() {
     try {
         products = await loadProducts();
@@ -92,287 +69,257 @@ async function loadProductsForDropdown() {
     }
 }
 
-/**
- * Show sales modal for creating new sale
- */
-function showSalesModal() {
-    // Reset form
+function resetSalesForm() {
+    editMode = false;
     document.getElementById('salesForm').reset();
+    document.getElementById('saleId').value = '';
     document.getElementById('saleDate').valueAsDate = new Date();
-    
-    // Clear items container
+    document.getElementById('salesModalTitle').textContent = 'Create New Sale';
+    document.getElementById('saleSubmitBtn').textContent = 'Complete Sale';
     document.getElementById('saleItemsContainer').innerHTML = '';
-    
-    // Add initial item
+}
+
+function showSalesModal() {
+    resetSalesForm();
     addSaleItem();
-    
-    // Reset totals
     updateSaleTotals();
-    
-    // Show modal
     document.getElementById('salesModal').style.display = 'block';
 }
 
-/**
- * Close sales modal
- */
 function closeSalesModal() {
     document.getElementById('salesModal').style.display = 'none';
+    resetSalesForm();
 }
 
-/**
- * Add sale item row
- */
-function addSaleItem() {
+function addSaleItem(productId = '', quantity = 1, unitPrice = '') {
     const container = document.getElementById('saleItemsContainer');
     const template = document.getElementById('saleItemTemplate');
     const clone = document.importNode(template.content, true);
-    
-    // Populate product dropdown
+
     const productSelect = clone.querySelector('.product-select');
+    const quantityInput = clone.querySelector('.item-quantity');
+    const priceInput = clone.querySelector('.item-price');
+
     populateProductDropdown(productSelect, products);
-    
+
+    if (productId) {
+        productSelect.value = productId;
+        quantityInput.value = quantity;
+        if (unitPrice !== '') {
+            priceInput.value = unitPrice;
+        } else {
+            updateItemPrice(productSelect);
+        }
+        updateItemTotal(quantityInput);
+    }
+
     container.appendChild(clone);
 }
 
-/**
- * Populate product dropdown
- * @param {HTMLElement} select - Select element
- * @param {Array} products - Products data
- */
-function populateProductDropdown(select, products) {
-    // Clear existing options
-    select.innerHTML = '<option value="">Select Product</option>';
-    
-    // Add products
-    products.forEach(product => {
-        const option = document.createElement('option');
-        option.value = product.id;
-        option.textContent = product.name;
-        option.dataset.price = product.sellingPrice;
-        option.dataset.stock = product.stock;
-        select.appendChild(option);
-    });
-}
-
-/**
- * Update item price when product is selected
- * @param {HTMLElement} select - Product select element
- */
 function updateItemPrice(select) {
     const row = select.closest('.item-row');
     const priceInput = row.querySelector('.item-price');
     const quantityInput = row.querySelector('.item-quantity');
     const totalInput = row.querySelector('.item-total');
-    
-    // Get selected option
+
     const option = select.options[select.selectedIndex];
-    
+
     if (option && option.dataset.price) {
-        // Set price
         priceInput.value = option.dataset.price;
-        
-        // Update total
-        totalInput.value = (parseFloat(priceInput.value) * parseInt(quantityInput.value)).toFixed(2);
-        
-        // Update sale totals
+        totalInput.value = (parseFloat(priceInput.value) * parseInt(quantityInput.value, 10)).toFixed(2);
         updateSaleTotals();
     } else {
         priceInput.value = '';
         totalInput.value = '';
-    }
-}
-
-/**
- * Update item total when quantity changes
- * @param {HTMLElement} input - Quantity input element
- */
-function updateItemTotal(input) {
-    const row = input.closest('.item-row');
-    const priceInput = row.querySelector('.item-price');
-    const totalInput = row.querySelector('.item-total');
-    
-    if (priceInput.value && input.value) {
-        totalInput.value = (parseFloat(priceInput.value) * parseInt(input.value)).toFixed(2);
-        
-        // Update sale totals
         updateSaleTotals();
     }
 }
 
-/**
- * Remove sale item
- * @param {HTMLElement} button - Remove button
- */
+function updateItemTotal(input) {
+    const row = input.closest('.item-row');
+    const priceInput = row.querySelector('.item-price');
+    const totalInput = row.querySelector('.item-total');
+
+    if (priceInput.value && input.value) {
+        totalInput.value = (parseFloat(priceInput.value) * parseInt(input.value, 10)).toFixed(2);
+        updateSaleTotals();
+    }
+}
+
 function removeSaleItem(button) {
-    const row = button.closest('.item-row');
-    row.remove();
-    
-    // Update sale totals
+    const rows = document.querySelectorAll('#saleItemsContainer .item-row');
+    if (rows.length <= 1) {
+        showToast('A sale must have at least one item', 'error');
+        return;
+    }
+    button.closest('.item-row').remove();
     updateSaleTotals();
 }
 
-/**
- * Update sale totals
- */
 function updateSaleTotals() {
-    const rows = document.querySelectorAll('.item-row');
+    const rows = document.querySelectorAll('#saleItemsContainer .item-row');
     let subtotal = 0;
-    
-    // Calculate subtotal
+
     rows.forEach(row => {
         const totalInput = row.querySelector('.item-total');
         if (totalInput.value) {
             subtotal += parseFloat(totalInput.value);
         }
     });
-    
-    // Get discount
+
     const discountPercent = parseFloat(document.getElementById('saleDiscountPercent').value) || 0;
     const discountAmount = parseFloat(document.getElementById('saleDiscountAmount').value) || 0;
-    
-    // Calculate discount
     const percentDiscount = subtotal * (discountPercent / 100);
     const totalDiscount = percentDiscount + discountAmount;
-    
-    // Calculate VAT (13%)
     const vatableAmount = subtotal - totalDiscount;
     const vat = vatableAmount * 0.13;
-    
-    // Calculate total
     const total = vatableAmount + vat;
-    
-    // Update display
+
     document.getElementById('saleSubtotal').textContent = `NPR ${formatCurrency(subtotal)}`;
     document.getElementById('saleVat').textContent = `NPR ${formatCurrency(vat)}`;
     document.getElementById('saleTotal').textContent = `NPR ${formatCurrency(total)}`;
 }
 
-/**
- * Handle sale form submission
- * @param {Event} event - Form submit event
- */
-async function handleSaleSubmit(event) {
-    event.preventDefault();
-    
-    // Get form values
-    const customer = document.getElementById('saleCustomer').value;
-    const date = document.getElementById('saleDate').value;
-    const discountPercent = parseFloat(document.getElementById('saleDiscountPercent').value) || 0;
-    const discountAmount = parseFloat(document.getElementById('saleDiscountAmount').value) || 0;
-    
-    // Get items
-    const itemRows = document.querySelectorAll('.item-row');
-    const items = [];
-    
-    // Validate items
+function collectSaleLines() {
+    const itemRows = document.querySelectorAll('#saleItemsContainer .item-row');
+    const lines = [];
     let isValid = true;
-    
+
     itemRows.forEach(row => {
         const productSelect = row.querySelector('.product-select');
-        const quantity = parseInt(row.querySelector('.item-quantity').value);
+        const quantity = parseInt(row.querySelector('.item-quantity').value, 10);
         const price = parseFloat(row.querySelector('.item-price').value);
-        
+
         if (!productSelect.value || !quantity || !price) {
             isValid = false;
             return;
         }
-        
-        items.push({
-            productId: parseInt(productSelect.value),
-            productName: productSelect.options[productSelect.selectedIndex].text,
-            quantity: quantity,
-            price: price,
-            total: price * quantity
+
+        lines.push({
+            productId: parseInt(productSelect.value, 10),
+            quantity,
+            unitPrice: price,
+            discountPercent: 0,
+            vatPercent: 13
         });
     });
-    
-    if (!isValid || items.length === 0) {
+
+    return { lines, isValid };
+}
+
+function buildSalePayload(saleId = null) {
+    const dateValue = document.getElementById('saleDate').value;
+    const customerName = document.getElementById('saleCustomer').value.trim() || 'Walk-in Customer';
+
+    const payload = {
+        soldAt: dateValue ? `${dateValue}T12:00:00Z` : new Date().toISOString(),
+        customerName,
+        orderDiscountPercent: parseFloat(document.getElementById('saleDiscountPercent').value) || 0,
+        orderDiscountAmount: parseFloat(document.getElementById('saleDiscountAmount').value) || 0,
+        lines: collectSaleLines().lines
+    };
+
+    if (saleId) {
+        payload.id = parseInt(saleId, 10);
+    }
+
+    return payload;
+}
+
+async function handleSaleSubmit(event) {
+    event.preventDefault();
+
+    const { lines, isValid } = collectSaleLines();
+    if (!isValid || lines.length === 0) {
         showToast('Please add at least one valid item', 'error');
         return;
     }
-    
-    // Calculate totals
-    let subtotal = 0;
-    items.forEach(item => {
-        subtotal += item.total;
-    });
-    
-    const percentDiscount = subtotal * (discountPercent / 100);
-    const totalDiscount = percentDiscount + discountAmount;
-    const vatableAmount = subtotal - totalDiscount;
-    const vat = vatableAmount * 0.13;
-    const total = vatableAmount + vat;
-    
-    // Create sale data
-    const saleData = {
-        customer: customer,
-        date: date,
-        items: items,
-        subtotal: subtotal,
-        discountPercent: discountPercent,
-        discountAmount: discountAmount,
-        totalDiscount: totalDiscount,
-        vat: vat,
-        totalAmount: total
-    };
-    
+
+    const saleId = document.getElementById('saleId').value;
+    const saleData = buildSalePayload(saleId || null);
+
     try {
-        // Create sale
-        await apiRequest('sales', 'POST', saleData);
-        
-        // Close modal
+        if (editMode && saleId) {
+            await apiRequest(`orders/sale/${saleId}`, 'PUT', saleData);
+            showToast('Sale updated successfully', 'success');
+        } else {
+            await apiRequest('orders/sale', 'POST', saleData);
+            showToast('Sale completed successfully', 'success');
+        }
+
         closeSalesModal();
-        
-        // Reload sales
         loadSales();
-        
-        // Show success message
-        showToast('Sale completed successfully', 'success');
+        loadProductsForDropdown();
     } catch (error) {
-        console.error('Error creating sale:', error);
-        showToast('Failed to complete sale', 'error');
+        console.error('Error saving sale:', error);
+        if (!error.message || error.message === 'API request failed') {
+            showToast(editMode ? 'Failed to update sale' : 'Failed to complete sale', 'error');
+        }
     }
 }
 
-/**
- * View sale details
- * @param {number} saleId - Sale ID
- */
+async function editSale(saleId) {
+    try {
+        await loadProductsForDropdown();
+        const sale = await apiRequest(`orders/sale/${saleId}`);
+
+        editMode = true;
+        document.getElementById('saleId').value = sale.id;
+        document.getElementById('salesModalTitle').textContent = `Edit Sale — ${sale.invoiceNumber}`;
+        document.getElementById('saleSubmitBtn').textContent = 'Update Sale';
+
+        document.getElementById('saleCustomer').value = sale.customer ? sale.customer.name : 'Walk-in Customer';
+        document.getElementById('saleDate').value = formatDate(sale.soldAt);
+        document.getElementById('saleDiscountPercent').value = 0;
+        document.getElementById('saleDiscountAmount').value = sale.discountAmount || 0;
+
+        document.getElementById('saleItemsContainer').innerHTML = '';
+        sale.lines.forEach(line => {
+            addSaleItem(line.productId, line.quantity, line.unitPrice);
+        });
+
+        updateSaleTotals();
+        document.getElementById('salesModal').style.display = 'block';
+    } catch (error) {
+        console.error('Error loading sale for edit:', error);
+        showToast('Failed to load sale for editing', 'error');
+    }
+}
+
 async function viewSaleDetails(saleId) {
     try {
-        // Get sale details
-        currentSale = await apiRequest(`sales/${saleId}`);
-        
-        // Populate details
+        currentSale = await apiRequest(`orders/sale/${saleId}`);
+
         document.getElementById('detailsInvoiceNumber').textContent = currentSale.invoiceNumber;
-        document.getElementById('detailsDate').textContent = formatDate(currentSale.date);
-        document.getElementById('detailsCustomer').textContent = currentSale.customer || 'Walk-in Customer';
-        
-        // Populate items table
+        document.getElementById('detailsDate').textContent = formatDate(currentSale.soldAt);
+        document.getElementById('detailsCustomer').textContent = currentSale.customer
+            ? currentSale.customer.name
+            : 'Walk-in Customer';
+
         const tableBody = document.getElementById('saleDetailsTableBody');
         tableBody.innerHTML = '';
-        
-        currentSale.items.forEach(item => {
+
+        currentSale.lines.forEach(line => {
             const row = document.createElement('tr');
-            
             row.innerHTML = `
-                <td>${item.productName}</td>
-                <td>NPR ${formatCurrency(item.price)}</td>
-                <td>${item.quantity}</td>
-                <td>NPR ${formatCurrency(item.total)}</td>
+                <td>${line.product ? line.product.name : 'Product'}</td>
+                <td>NPR ${formatCurrency(line.unitPrice)}</td>
+                <td>${line.quantity}</td>
+                <td>NPR ${formatCurrency(line.lineTotal)}</td>
             `;
-            
             tableBody.appendChild(row);
         });
-        
-        // Update summary
+
         document.getElementById('detailsSubtotal').textContent = `NPR ${formatCurrency(currentSale.subtotal)}`;
-        document.getElementById('detailsDiscount').textContent = `NPR ${formatCurrency(currentSale.totalDiscount)}`;
-        document.getElementById('detailsVat').textContent = `NPR ${formatCurrency(currentSale.vat)}`;
+        document.getElementById('detailsDiscount').textContent = `NPR ${formatCurrency(currentSale.discountAmount)}`;
+        document.getElementById('detailsVat').textContent = `NPR ${formatCurrency(currentSale.vatAmount)}`;
         document.getElementById('detailsTotal').textContent = `NPR ${formatCurrency(currentSale.totalAmount)}`;
-        
-        // Show modal
+
+        document.getElementById('detailsEditBtn').onclick = () => {
+            closeSaleDetailsModal();
+            editSale(saleId);
+        };
+
         document.getElementById('saleDetailsModal').style.display = 'block';
     } catch (error) {
         console.error('Error loading sale details:', error);
@@ -380,23 +327,14 @@ async function viewSaleDetails(saleId) {
     }
 }
 
-/**
- * Close sale details modal
- */
 function closeSaleDetailsModal() {
     document.getElementById('saleDetailsModal').style.display = 'none';
 }
 
-/**
- * Print sale details
- */
 function printSaleDetails() {
     if (!currentSale) return;
-    
-    // Create print window
+
     const printWindow = window.open('', '_blank');
-    
-    // Create print content
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
@@ -405,7 +343,6 @@ function printSaleDetails() {
             <style>
                 body { font-family: Arial, sans-serif; margin: 20px; }
                 .header { text-align: center; margin-bottom: 20px; }
-                .invoice-details { margin-bottom: 20px; }
                 table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
                 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                 th { background-color: #f2f2f2; }
@@ -418,79 +355,60 @@ function printSaleDetails() {
                 <h1>Daily Deals Inventory System</h1>
                 <h2>Sale Invoice</h2>
             </div>
-            
-            <div class="invoice-details">
-                <p><strong>Invoice #:</strong> ${currentSale.invoiceNumber}</p>
-                <p><strong>Date:</strong> ${formatDate(currentSale.date)}</p>
-                <p><strong>Customer:</strong> ${currentSale.customer || 'Walk-in Customer'}</p>
-            </div>
-            
+            <p><strong>Invoice #:</strong> ${currentSale.invoiceNumber}</p>
+            <p><strong>Date:</strong> ${formatDate(currentSale.soldAt)}</p>
+            <p><strong>Customer:</strong> ${currentSale.customer ? currentSale.customer.name : 'Walk-in Customer'}</p>
             <table>
                 <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
-                    </tr>
+                    <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th></tr>
                 </thead>
                 <tbody>
     `);
-    
-    // Add items
-    currentSale.items.forEach(item => {
+
+    currentSale.lines.forEach(line => {
         printWindow.document.write(`
             <tr>
-                <td>${item.productName}</td>
-                <td>NPR ${formatCurrency(item.price)}</td>
-                <td>${item.quantity}</td>
-                <td>NPR ${formatCurrency(item.total)}</td>
+                <td>${line.product ? line.product.name : 'Product'}</td>
+                <td>NPR ${formatCurrency(line.unitPrice)}</td>
+                <td>${line.quantity}</td>
+                <td>NPR ${formatCurrency(line.lineTotal)}</td>
             </tr>
         `);
     });
-    
-    // Add summary
+
     printWindow.document.write(`
                 </tbody>
             </table>
-            
             <div class="summary">
                 <p><strong>Subtotal:</strong> NPR ${formatCurrency(currentSale.subtotal)}</p>
-                <p><strong>Discount:</strong> NPR ${formatCurrency(currentSale.totalDiscount)}</p>
-                <p><strong>VAT (13%):</strong> NPR ${formatCurrency(currentSale.vat)}</p>
+                <p><strong>Discount:</strong> NPR ${formatCurrency(currentSale.discountAmount)}</p>
+                <p><strong>VAT (13%):</strong> NPR ${formatCurrency(currentSale.vatAmount)}</p>
                 <p class="total"><strong>Total:</strong> NPR ${formatCurrency(currentSale.totalAmount)}</p>
             </div>
         </body>
         </html>
     `);
-    
-    // Print
+
     printWindow.document.close();
     printWindow.focus();
     printWindow.print();
     printWindow.close();
 }
 
-/**
- * Delete sale
- * @param {number} saleId - Sale ID
- */
 async function deleteSale(saleId) {
-    // Confirm deletion
-    if (!confirm('Are you sure you want to delete this sale?')) {
+    if (!confirm('Are you sure you want to delete this sale? Stock will be restored.')) {
         return;
     }
-    
+
     try {
-        await apiRequest(`sales/${saleId}`, 'DELETE');
-        
-        // Reload sales
+        await apiRequest(`orders/sale/${saleId}`, 'DELETE');
         loadSales();
-        
-        // Show success message
+        loadProductsForDropdown();
         showToast('Sale deleted successfully', 'success');
     } catch (error) {
         console.error('Error deleting sale:', error);
-        showToast('Failed to delete sale', 'error');
+        if (!error.message || error.message === 'API request failed') {
+            showToast('Failed to delete sale', 'error');
+        }
     }
 }
