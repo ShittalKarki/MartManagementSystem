@@ -94,11 +94,35 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
         const response = await fetch(url, options);
         
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'API request failed');
+            let message = 'API request failed';
+            const errorText = await response.text();
+            if (errorText) {
+                try {
+                    const errorData = JSON.parse(errorText);
+                    if (errorData.errors) {
+                        const details = Object.values(errorData.errors).flat().join(' ');
+                        message = details || errorData.title || message;
+                    } else {
+                        message = errorData.message || errorData.title || errorData.detail || message;
+                    }
+                } catch {
+                    message = errorText;
+                }
+            }
+            throw new Error(message);
         }
         
-        return await response.json();
+        // PUT/DELETE often return 204 No Content with an empty body
+        if (response.status === 204) {
+            return null;
+        }
+        
+        const text = await response.text();
+        if (!text) {
+            return null;
+        }
+        
+        return JSON.parse(text);
     } catch (error) {
         console.error('API request error:', error);
         showToast(error.message, 'error');
@@ -158,8 +182,10 @@ async function loadProducts() {
  * @param {string} selectId - ID of select element
  * @param {Array} products - Products data
  */
-function populateProductDropdown(selectId, products) {
-    const select = document.getElementById(selectId);
+function populateProductDropdown(selectOrId, products) {
+    const select = typeof selectOrId === 'string'
+        ? document.getElementById(selectOrId)
+        : selectOrId;
     if (!select) return;
     
     // Clear existing options
@@ -171,7 +197,7 @@ function populateProductDropdown(selectId, products) {
         option.value = product.id;
         option.textContent = product.name;
         option.dataset.price = product.sellingPrice;
-        option.dataset.stock = product.stock;
+        option.dataset.stock = product.stockOnHand;
         select.appendChild(option);
     });
 }
